@@ -397,12 +397,12 @@ public class ProjectPaneController implements Initializable {
      */
     @FXML
     private void setGeneratedComponentsVisibilityButtonClicked() {
-        if (generatedComponentsVisibilityButtonIcon.getIconCode() == Material.EXPAND_MORE) {
-            generatedComponentsVisibilityButtonIcon.setIconCode(Material.EXPAND_LESS);
+        if (generatedComponentsVisibilityButtonIcon.getIconCode() == Material.ARROW_LEFT) {
+            generatedComponentsVisibilityButtonIcon.setIconCode(Material.ARROW_DROP_DOWN);
             this.tempFilesList.setVisible(true);
             this.tempFilesList.setManaged(true);
         } else {
-            generatedComponentsVisibilityButtonIcon.setIconCode(Material.EXPAND_MORE);
+            generatedComponentsVisibilityButtonIcon.setIconCode(Material.ARROW_LEFT);
             this.tempFilesList.setVisible(false);
             this.tempFilesList.setManaged(false);
         }
