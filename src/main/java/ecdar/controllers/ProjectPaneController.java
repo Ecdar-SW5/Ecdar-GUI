@@ -83,6 +83,13 @@ public class ProjectPaneController implements Initializable {
                 c.getAddedSubList().forEach(this::handleAddedModel);
                 c.getRemoved().forEach(this::handleRemovedModel);
 
+                if(tempFilesList.getChildren().isEmpty()){
+                    generatedComponentsDivider.setVisible(false);
+                }
+                else{
+                    generatedComponentsDivider.setVisible(true);
+                }
+
                 // Sort the children alphabetically
                 sortPresentations();
             }
