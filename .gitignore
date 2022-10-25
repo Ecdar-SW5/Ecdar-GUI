@@ -8,6 +8,8 @@ lib/j-Ecdar
 lib/j-Ecdar.bat
 lib/*.dll
 
+/bin
+.vscode/
 
 #IntelliJ
 .idea/

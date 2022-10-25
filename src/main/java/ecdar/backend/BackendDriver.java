@@ -4,9 +4,11 @@ import EcdarProtoBuf.ComponentProtos;
 import EcdarProtoBuf.EcdarBackendGrpc;
 import EcdarProtoBuf.ObjectProtos;
 import EcdarProtoBuf.QueryProtos;
+import EcdarProtoBuf.QueryProtos.QueryResponse;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.protobuf.Empty;
+
 import ecdar.Ecdar;
 import ecdar.abstractions.BackendInstance;
 import ecdar.abstractions.Component;
@@ -85,26 +87,25 @@ public class BackendDriver {
             return;
         }
 
-        QueryProtos.ComponentsUpdateRequest.Builder componentsBuilder = QueryProtos.ComponentsUpdateRequest.newBuilder();
+        ComponentProtos.ComponentsInfo.Builder componentsInfoBuilder = ComponentProtos.ComponentsInfo.newBuilder();
         for (Component c : Ecdar.getProject().getComponents()) {
-            componentsBuilder.addComponents(ComponentProtos.Component.newBuilder().setJson(c.serialize().toString()).build());
+            componentsInfoBuilder.addComponents(ComponentProtos.Component.newBuilder().setJson(c.serialize().toString()).build());
         }
 
         executeGrpcRequest(query.getQuery().getQuery(),
                 backendConnection,
-                componentsBuilder,
+                componentsInfoBuilder,
                 QueryProtos.IgnoredInputOutputs.newBuilder().getDefaultInstanceForType(),
                 (response) -> {
-                    if (response.hasQuery() && response.getQuery().hasIgnoredInputOutputs()) {
-                        var ignoredInputOutputs = response.getQuery().getIgnoredInputOutputs();
-                        query.addNewElementsToMap(new ArrayList<>(ignoredInputOutputs.getIgnoredInputsList()), new ArrayList<>(ignoredInputOutputs.getIgnoredOutputsList()));
+                    if (response.hasQueryOk() && query.ignoredInputs != null && query.ignoredOutputs != null) {
+                        // var ignoredInputOutputs = response.getQuery().getIgnoredInputOutputs();
+                        query.addNewElementsToMap(new ArrayList<>(query.ignoredInputs.keySet()), new ArrayList<>(query.ignoredOutputs.keySet()));
                     } else {
                         // Response is unexpected, maybe just ignore
                     }
                 }, (t) -> {
                 }
         );
-
     }
 
     /**
@@ -121,12 +122,16 @@ public class BackendDriver {
     private void executeQuery(ExecutableQuery executableQuery, BackendConnection backendConnection) {
         if (executableQuery.queryListener.getQuery().getQueryState() == QueryState.UNKNOWN) return;
 
-        QueryProtos.ComponentsUpdateRequest.Builder componentsBuilder = QueryProtos.ComponentsUpdateRequest.newBuilder();
+        ComponentProtos.ComponentsInfo.Builder componentsInfoBuilder = ComponentProtos.ComponentsInfo.newBuilder();
         for (Component c : Ecdar.getProject().getComponents()) {
-            componentsBuilder.addComponents(ComponentProtos.Component.newBuilder().setJson(c.serialize().toString()).build());
+            if (executableQuery.query.contains(c.getName())) {
+                componentsInfoBuilder.addComponents(ComponentProtos.Component.newBuilder().setJson(c.serialize().toString()).build());
+            }
         }
 
-        executeGrpcRequest(executableQuery, backendConnection, componentsBuilder);
+        componentsInfoBuilder.setComponentsHash(componentsInfoBuilder.getComponentsList().hashCode());
+
+        executeGrpcRequest(executableQuery, backendConnection, componentsInfoBuilder);
     }
 
     /**
@@ -139,7 +144,7 @@ public class BackendDriver {
      */
     private void executeGrpcRequest(ExecutableQuery executableQuery,
                                     BackendConnection backendConnection,
-                                    QueryProtos.ComponentsUpdateRequest.Builder componentsBuilder) {
+                                    ComponentProtos.ComponentsInfo.Builder componentsBuilder) {
         executeGrpcRequest(executableQuery.query,
                 backendConnection,
                 componentsBuilder,
@@ -157,15 +162,15 @@ public class BackendDriver {
      *
      * @param query                       query to be executed by the backend
      * @param backendConnection           connection to the backend
-     * @param componentsBuilder           components builder containing the components relevant to the query execution
+     * @param componentsInfoBuilder           components builder containing the components relevant to the query execution
      * @param protoBufIgnoredInputOutputs ProtoBuf object containing the inputs and outputs that should be ignored
      *                                    (can be null)
      * @param responseConsumer            consumer for handling the received response
      * @param errorConsumer               consumer for handling a potential error
      */
     private void executeGrpcRequest(String query,
-                                    BackendConnection backendConnection,
-                                    QueryProtos.ComponentsUpdateRequest.Builder componentsBuilder,
+    BackendConnection backendConnection,
+                                    ComponentProtos.ComponentsInfo.Builder componentsInfoBuilder,
                                     QueryProtos.IgnoredInputOutputs protoBufIgnoredInputOutputs,
                                     Consumer<QueryProtos.QueryResponse> responseConsumer,
                                     Consumer<Throwable> errorConsumer) {
@@ -182,7 +187,7 @@ public class BackendDriver {
 
             @Override
             public void onCompleted() {
-                StreamObserver<QueryProtos.QueryResponse> responseObserver = new StreamObserver<>() {
+                StreamObserver<QueryProtos.QueryResponse> responseObserver = new StreamObserver<QueryProtos.QueryResponse>() {
                     @Override
                     public void onNext(QueryProtos.QueryResponse value) {
                         responseConsumer.accept(value);
@@ -193,17 +198,20 @@ public class BackendDriver {
                         errorConsumer.accept(t);
                         addBackendConnection(backendConnection);
                     }
-
+                    
                     @Override
                     public void onCompleted() {
                         addBackendConnection(backendConnection);
                     }
                 };
 
-                var queryBuilder = QueryProtos.Query.newBuilder()
-                        .setId(0)
-                        .setQuery(query);
-
+               
+                var queryBuilder = QueryProtos.QueryRequest.newBuilder()
+                .setUserId(1)
+                .setQueryId(1)
+                .setQuery(query)
+                .setComponentsInfo(componentsInfoBuilder.build());
+                
                 if (protoBufIgnoredInputOutputs != null)
                     queryBuilder.setIgnoredInputOutputs(protoBufIgnoredInputOutputs);
 
@@ -212,8 +220,16 @@ public class BackendDriver {
             }
         };
 
+        var queryBuilder = QueryProtos.QueryRequest.newBuilder()
+            .setUserId(1)
+            .setQueryId(query.hashCode())
+            .setQuery(query)
+            .setComponentsInfo(componentsInfoBuilder.build());
+
+        System.out.println("Sending query: " + queryBuilder.build().toString());
+
         backendConnection.getStub().withDeadlineAfter(deadlineForResponses, TimeUnit.MILLISECONDS)
-                .updateComponents(componentsBuilder.build(), observer);
+            .sendQuery(queryBuilder.build(), observer);
     }
 
     private void addBackendConnection(BackendConnection backendConnection) {
@@ -317,24 +333,38 @@ public class BackendDriver {
         // If the query has been cancelled, ignore the result
         if (executableQuery.queryListener.getQuery().getQueryState() == QueryState.UNKNOWN) return;
 
-        if (value.hasRefinement() && value.getRefinement().getSuccess()) {
-            executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
-            executableQuery.success.accept(true);
-        } else if (value.hasConsistency() && value.getConsistency().getSuccess()) {
-            executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
-            executableQuery.success.accept(true);
-        } else if (value.hasDeterminism() && value.getDeterminism().getSuccess()) {
-            executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
-            executableQuery.success.accept(true);
-        } else if (value.hasComponent()) {
-            executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
-            executableQuery.success.accept(true);
-            JsonObject returnedComponent = (JsonObject) JsonParser.parseString(value.getComponent().getComponent().getJson());
-            addGeneratedComponent(new Component(returnedComponent));
-        } else {
+        if (value.hasUserTokenError()) {
             executableQuery.queryListener.getQuery().setQueryState(QueryState.ERROR);
             executableQuery.success.accept(false);
+        } else if (value.hasQueryOk()) {
+            if (value.getQueryOk().hasComponent()) {
+                executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
+                JsonObject returnedComponent = (JsonObject) JsonParser.parseString(value.getQueryOk().getComponent().getComponent().getJson());
+                addGeneratedComponent(new Component(returnedComponent));
+            } else {
+                executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
+                executableQuery.success.accept(true);
+            }
         }
+
+        // if (value.hasRefinement() && value.getRefinement().getSuccess()) {
+        //     executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
+        //     executableQuery.success.accept(true);
+        // } else if (value.hasConsistency() && value.getConsistency().getSuccess()) {
+        //     executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
+        //     executableQuery.success.accept(true);
+        // } else if (value.hasDeterminism() && value.getDeterminism().getSuccess()) {
+        //     executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
+        //     executableQuery.success.accept(true);
+        // } else if (value.hasComponent()) {
+        //     executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
+        //     executableQuery.success.accept(true);
+        //     JsonObject returnedComponent = (JsonObject) JsonParser.parseString(value.getComponent().getComponent().getJson());
+        //     addGeneratedComponent(new Component(returnedComponent));
+        // } else {
+        //     executableQuery.queryListener.getQuery().setQueryState(QueryState.ERROR);
+        //     executableQuery.success.accept(false);
+        // }
     }
 
     private void handleQueryBackendError(Throwable t, ExecutableQuery executableQuery) {
@@ -388,7 +418,7 @@ public class BackendDriver {
     }
 
     public SimulationState getInitialSimulationState() {
-            SimulationState state = new SimulationState(ObjectProtos.StateTuple.newBuilder().getDefaultInstanceForType());
+            SimulationState state = new SimulationState(ObjectProtos.State.newBuilder().getDefaultInstanceForType());
             state.getLocations().add(new Pair<>(Ecdar.getProject().getComponents().get(0).getName(), Ecdar.getProject().getComponents().get(0).getLocations().get(0).getId()));
             return state;
         }
