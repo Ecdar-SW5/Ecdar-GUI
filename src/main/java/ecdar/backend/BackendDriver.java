@@ -169,14 +169,15 @@ public class BackendDriver {
      * @param errorConsumer               consumer for handling a potential error
      */
     private void executeGrpcRequest(String query,
-    BackendConnection backendConnection,
+                                    BackendConnection backendConnection,
                                     ComponentProtos.ComponentsInfo.Builder componentsInfoBuilder,
                                     QueryProtos.IgnoredInputOutputs protoBufIgnoredInputOutputs,
                                     Consumer<QueryProtos.QueryResponse> responseConsumer,
                                     Consumer<Throwable> errorConsumer) {
-        StreamObserver<Empty> observer = new StreamObserver<>() {
+        StreamObserver<QueryProtos.QueryResponse> responseObserver = new StreamObserver<QueryProtos.QueryResponse>() {
             @Override
-            public void onNext(Empty value) {
+            public void onNext(QueryProtos.QueryResponse value) {
+                responseConsumer.accept(value);
             }
 
             @Override
@@ -187,50 +188,21 @@ public class BackendDriver {
 
             @Override
             public void onCompleted() {
-                StreamObserver<QueryProtos.QueryResponse> responseObserver = new StreamObserver<QueryProtos.QueryResponse>() {
-                    @Override
-                    public void onNext(QueryProtos.QueryResponse value) {
-                        responseConsumer.accept(value);
-                    }
-
-                    @Override
-                    public void onError(Throwable t) {
-                        errorConsumer.accept(t);
-                        addBackendConnection(backendConnection);
-                    }
-                    
-                    @Override
-                    public void onCompleted() {
-                        addBackendConnection(backendConnection);
-                    }
-                };
-
-               
-                var queryBuilder = QueryProtos.QueryRequest.newBuilder()
-                .setUserId(1)
-                .setQueryId(1)
-                .setQuery(query)
-                .setComponentsInfo(componentsInfoBuilder.build());
-                
-                if (protoBufIgnoredInputOutputs != null)
-                    queryBuilder.setIgnoredInputOutputs(protoBufIgnoredInputOutputs);
-
-                backendConnection.getStub().withDeadlineAfter(deadlineForResponses, TimeUnit.MILLISECONDS)
-                        .sendQuery(queryBuilder.build(), responseObserver);
-            }
+                addBackendConnection(backendConnection);
+            };
         };
-
         var queryBuilder = QueryProtos.QueryRequest.newBuilder()
             .setUserId(1)
             .setQueryId(query.hashCode())
             .setQuery(query)
             .setComponentsInfo(componentsInfoBuilder.build());
 
-        System.out.println("Sending query: " + queryBuilder.build().toString());
+        if (protoBufIgnoredInputOutputs != null)
+            queryBuilder.setIgnoredInputOutputs(protoBufIgnoredInputOutputs);
 
         backendConnection.getStub().withDeadlineAfter(deadlineForResponses, TimeUnit.MILLISECONDS)
-            .sendQuery(queryBuilder.build(), observer);
-    }
+            .sendQuery(queryBuilder.build(), responseObserver);
+    };
 
     private void addBackendConnection(BackendConnection backendConnection) {
         this.openBackendConnections.get(backendConnection.getBackendInstance()).add(backendConnection);
@@ -332,7 +304,7 @@ public class BackendDriver {
     private void handleQueryResponse(QueryProtos.QueryResponse value, ExecutableQuery executableQuery) {
         // If the query has been cancelled, ignore the result
         if (executableQuery.queryListener.getQuery().getQueryState() == QueryState.UNKNOWN) return;
-
+        System.out.println(value);
         if (value.hasUserTokenError()) {
             executableQuery.queryListener.getQuery().setQueryState(QueryState.ERROR);
             executableQuery.success.accept(false);
