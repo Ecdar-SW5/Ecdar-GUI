@@ -203,7 +203,6 @@ public class BackendDriver {
         backendConnection.getStub().withDeadlineAfter(deadlineForResponses, TimeUnit.MILLISECONDS)
             .sendQuery(queryBuilder.build(), responseObserver);
     };
-
     private void addBackendConnection(BackendConnection backendConnection) {
         this.openBackendConnections.get(backendConnection.getBackendInstance()).add(backendConnection);
     }
@@ -303,40 +302,26 @@ public class BackendDriver {
 
     private void handleQueryResponse(QueryProtos.QueryResponse value, ExecutableQuery executableQuery) {
         // If the query has been cancelled, ignore the result
-        if (executableQuery.queryListener.getQuery().getQueryState() == QueryState.UNKNOWN) return;
-        System.out.println(value);
-        if (value.hasUserTokenError()) {
+        //System.out.println(value);
+
+        if (value.getQueryOk().hasRefinement() && value.getQueryOk().getRefinement().getSuccess()) {
+            executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
+            executableQuery.success.accept(true);
+        } else if (value.getQueryOk().hasConsistency() && value.getQueryOk().getConsistency().getSuccess()) {
+            executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
+            executableQuery.success.accept(true);
+        } else if (value.getQueryOk().hasDeterminism() && value.getQueryOk().getDeterminism().getSuccess()) {
+            executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
+            executableQuery.success.accept(true);
+        } else if (value.getQueryOk().hasComponent()) {
+            executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
+            executableQuery.success.accept(true);
+            JsonObject returnedComponent = (JsonObject) JsonParser.parseString(value.getQueryOk().getComponent().getComponent().getJson());
+            addGeneratedComponent(new Component(returnedComponent));
+        } else {
             executableQuery.queryListener.getQuery().setQueryState(QueryState.ERROR);
             executableQuery.success.accept(false);
-        } else if (value.hasQueryOk()) {
-            if (value.getQueryOk().hasComponent()) {
-                executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
-                JsonObject returnedComponent = (JsonObject) JsonParser.parseString(value.getQueryOk().getComponent().getComponent().getJson());
-                addGeneratedComponent(new Component(returnedComponent));
-            } else {
-                executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
-                executableQuery.success.accept(true);
-            }
         }
-
-        // if (value.hasRefinement() && value.getRefinement().getSuccess()) {
-        //     executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
-        //     executableQuery.success.accept(true);
-        // } else if (value.hasConsistency() && value.getConsistency().getSuccess()) {
-        //     executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
-        //     executableQuery.success.accept(true);
-        // } else if (value.hasDeterminism() && value.getDeterminism().getSuccess()) {
-        //     executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
-        //     executableQuery.success.accept(true);
-        // } else if (value.hasComponent()) {
-        //     executableQuery.queryListener.getQuery().setQueryState(QueryState.SUCCESSFUL);
-        //     executableQuery.success.accept(true);
-        //     JsonObject returnedComponent = (JsonObject) JsonParser.parseString(value.getComponent().getComponent().getJson());
-        //     addGeneratedComponent(new Component(returnedComponent));
-        // } else {
-        //     executableQuery.queryListener.getQuery().setQueryState(QueryState.ERROR);
-        //     executableQuery.success.accept(false);
-        // }
     }
 
     private void handleQueryBackendError(Throwable t, ExecutableQuery executableQuery) {
