@@ -281,13 +281,6 @@ public abstract class DisplayableEdge implements Nearable {
      */
     protected void setId() {
         id.set(UUID.randomUUID().toString());
-        return;
-        // for(int counter = 0; ; counter++) {
-        //     if(!Ecdar.getProject().getEdgeIds().contains(String.valueOf(Edge.EDGE + counter))){
-        //         id.set(Edge.EDGE + counter);
-        //         return;
-        //     }
-        // }
     }
 
     /**

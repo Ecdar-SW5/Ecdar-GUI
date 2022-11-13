@@ -92,13 +92,6 @@ public class GroupedEdge extends DisplayableEdge {
      */
     protected void setId() {
         id.set(UUID.randomUUID().toString());
-        return;
-        // for(int counter = 0; ; counter++) {
-        //     if(!Ecdar.getProject().getEdgeIds().contains(String.valueOf(Edge.EDGE_GROUP + counter))){
-        //         id.set(Edge.EDGE_GROUP + counter);
-        //         return;
-        //     }
-        // }
     }
 
     /**
