@@ -96,6 +96,7 @@ public class NailPresentation extends Group implements SelectHelper.Selectable, 
                     propertyTag.setTranslateX(controller.getNail().getPropertyX());
                     propertyTag.setTranslateY(controller.getNail().getPropertyY());
                 }
+
                 controller.getNail().propertyXProperty().bindBidirectional(propertyTag.translateXProperty());
                 controller.getNail().propertyYProperty().bindBidirectional(propertyTag.translateYProperty());
 

@@ -3,8 +3,8 @@ package ecdar.controllers;
 import com.jfoenix.controls.JFXRippler;
 import ecdar.Ecdar;
 import ecdar.abstractions.Location;
+import ecdar.simulation.SimulationHandler;
 import ecdar.simulation.SimulationState;
-import ecdar.backend.SimulationHandler;
 import ecdar.presentations.TransitionPresentation;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -116,7 +116,7 @@ public class TracePaneElementController implements Initializable {
             event.consume();
             final SimulationHandler simHandler = Ecdar.getSimulationHandler();
             if (simHandler == null) return;
-            Ecdar.getSimulationHandler().selectTransitionFromLog(state);
+            // Ecdar.getSimulationHandler().selectTransitionFromLog(state);
         });
 
         EventHandler mouseEntered = transitionPresentation.getOnMouseEntered();
@@ -160,7 +160,7 @@ public class TracePaneElementController implements Initializable {
             Location loc = Ecdar.getProject()
                     .findComponent(state.getLocations().get(i).getKey())
                     .findLocation(state.getLocations().get(i).getValue());
-            String locationName = loc.getNickname();
+            String locationName = loc.getId();
             if (i == length - 1) {
                 title.append(locationName);
             } else {

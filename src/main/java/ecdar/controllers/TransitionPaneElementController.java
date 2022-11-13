@@ -4,8 +4,8 @@ import com.jfoenix.controls.JFXRippler;
 import com.jfoenix.controls.JFXTextField;
 import ecdar.Ecdar;
 import ecdar.abstractions.Edge;
+import ecdar.simulation.SimulationHandler;
 import ecdar.simulation.Transition;
-import ecdar.backend.SimulationHandler;
 import ecdar.presentations.TransitionPresentation;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -45,16 +45,16 @@ public class TransitionPaneElementController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Ecdar.getSimulationHandler().availableTransitions.addListener((ListChangeListener<Transition>) c -> {
-            while (c.next()) {
-                for (Transition trans : c.getAddedSubList()) insertTransition(trans);
+        // Ecdar.getSimulationHandler().availableTransitions.addListener((ListChangeListener<Transition>) c -> {
+        //     while (c.next()) {
+        //         for (Transition trans : c.getAddedSubList()) insertTransition(trans);
 
-                for (final Transition trans: c.getRemoved()) {
-                    transitionList.getChildren().remove(transitionPresentationMap.get(trans));
-                    transitionPresentationMap.remove(trans);
-                }
-            }
-        });
+        //         for (final Transition trans: c.getRemoved()) {
+        //             transitionList.getChildren().remove(transitionPresentationMap.get(trans));
+        //             transitionPresentationMap.remove(trans);
+        //         }
+        //     }
+        // });
 
         initializeTransitionExpand();
         initializeDelayChooser();
@@ -137,10 +137,10 @@ public class TransitionPaneElementController implements Initializable {
         // Add the event to existing mouseEntered events
         // e.g. TransitionPresentation already has mouseEntered functionality and we want to keep it
         EventHandler mouseEntered = transitionPresentation.getOnMouseEntered();
-        transitionPresentation.setOnMouseEntered(event -> {
-            SimulatorController.setSelectedTransition(transitionPresentation.getController().getTransition());
-            mouseEntered.handle(event);
-        });
+        // transitionPresentation.setOnMouseEntered(event -> {
+        //     SimulatorController.setSelectedTransition(transitionPresentation.getController().getTransition());
+        //     mouseEntered.handle(event);
+        // });
 
         EventHandler mouseExited = transitionPresentation.getOnMouseExited();
         transitionPresentation.setOnMouseExited(event -> {
@@ -148,15 +148,15 @@ public class TransitionPaneElementController implements Initializable {
             mouseExited.handle(event);
         });
 
-        transitionPresentation.setOnMouseClicked(event -> {
-            event.consume();
+        // transitionPresentation.setOnMouseClicked(event -> {
+        //     event.consume();
 
-            // Performs the next step of the simulation when clicking on a transition
-            SimulationHandler simHandler = Ecdar.getSimulationHandler();
-            if (simHandler != null) {
-                simHandler.nextStep(transitionPresentation.getController().getTransition(), this.delay.get());
-            }
-        });
+        //     // Performs the next step of the simulation when clicking on a transition
+        //     SimulationHandler simHandler = Ecdar.getSimulationHandler();
+        //     if (simHandler != null) {
+        //         // simHandler.nextStep(transitionPresentation.getController().getTransition(), this.delay.get());
+        //     }
+        // });
 
         transitionPresentationMap.put(transition, transitionPresentation);
 

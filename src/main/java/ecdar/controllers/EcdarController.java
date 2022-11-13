@@ -1005,6 +1005,7 @@ public class EcdarController implements Initializable {
         leftPane.getChildren().add(projectPane);
         rightPane.getChildren().clear();
         rightPane.getChildren().add(queryPane);
+        scaling.selectToggle(scaleM); // temporary fix for scaling issue
 
         // Enable or disable the menu items that can be used when in the simulator
 //        updateMenuItems();

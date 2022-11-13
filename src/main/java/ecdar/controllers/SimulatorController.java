@@ -2,11 +2,10 @@ package ecdar.controllers;
 
 import ecdar.Ecdar;
 import ecdar.abstractions.*;
-import ecdar.backend.SimulationHandler;
 import ecdar.presentations.SimulationInitializationDialogPresentation;
 import ecdar.presentations.SimulatorOverviewPresentation;
+import ecdar.simulation.SimulationHandler;
 import ecdar.simulation.SimulationState;
-import ecdar.simulation.Transition;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -28,7 +27,7 @@ public class SimulatorController implements Initializable {
     private boolean firstTimeInSimulator;
     private final static DoubleProperty width = new SimpleDoubleProperty(),
             height = new SimpleDoubleProperty();
-    private static ObjectProperty<Transition> selectedTransition = new SimpleObjectProperty<>();
+    private static ObjectProperty<Edge> selectedEdge = new SimpleObjectProperty<>();
     private static ObjectProperty<SimulationState> selectedState = new SimpleObjectProperty<>();
 
     @Override
@@ -48,7 +47,7 @@ public class SimulatorController implements Initializable {
         final SimulationHandler sm = Ecdar.getSimulationHandler();
         boolean shouldSimulationBeReset = true;
 
-        if (sm.getCurrentState() == null) sm.initialStep(); // ToDo NIELS: Find better solution
+
 
         //Have the user left a trace or is he simulating a query
         if (sm.traceLog.size() >= 2 || sm.getCurrentSimulation().contains(SimulationHandler.QUERY_PREFIX)) {
@@ -59,14 +58,34 @@ public class SimulatorController implements Initializable {
                 .containsAll(findComponentsInCurrentSimulation(SimulationInitializationDialogController.ListOfComponents))) {
             shouldSimulationBeReset = true;
         }
-
-        if (shouldSimulationBeReset || firstTimeInSimulator) {
-
+        
+        if (shouldSimulationBeReset || firstTimeInSimulator || sm.currentState.get() == null) {
+            sm.currentState.addListener((observable, oldValue, newValue) -> {
+                if (newValue == null) {
+                    return;
+                }
+                overviewPresentation.getController().unhighlightProcesses();
+                overviewPresentation.getController().highlightProcessState(newValue);
+                overviewPresentation.getController().highlightAvailableEdges(newValue);
+            });
+            
+            sm.selectedEdge.addListener((observable, oldValue, newValue) -> {
+                if (newValue == null) {
+                    return;
+                }
+                overviewPresentation.getController().unhighlightProcesses();
+                sm.nextStep();
+            });
             resetSimulation();
-            sm.resetToInitialLocation();
+            sm.initialStep();
         }
+
         overviewPresentation.getController().addProcessesToGroup();
-        overviewPresentation.getController().highlightProcessState(sm.getCurrentState());
+        if (sm.currentState.get() != null) {
+            overviewPresentation.getController().highlightProcessState(sm.currentState.get());
+            overviewPresentation.getController().highlightAvailableEdges(sm.currentState.get());
+        }
+
     }
 
     /**
@@ -124,7 +143,7 @@ public class SimulatorController implements Initializable {
         overviewPresentation.getController().getComponentObservableList().forEach(component -> {
             // Previously reset coordinates of component box
         });
-        overviewPresentation.getController().unhighlightProcesses();
+        // overviewPresentation.getController().unhighlightProcesses();
     }
 
     public static DoubleProperty getWidthProperty() {
@@ -136,12 +155,12 @@ public class SimulatorController implements Initializable {
     }
 
 
-    public static ObjectProperty<Transition> getSelectedTransitionProperty() {
-        return selectedTransition;
+    public static ObjectProperty<Edge> getSelectedTransitionProperty() {
+        return selectedEdge;
     }
 
-    public static void setSelectedTransition(Transition selectedTransition) {
-        SimulatorController.selectedTransition.set(selectedTransition);
+    public static void setSelectedTransition(Edge selectedEdge) {
+        SimulatorController.selectedEdge.set(selectedEdge);
     }
 
     public static ObjectProperty<SimulationState> getSelectedStateProperty() {

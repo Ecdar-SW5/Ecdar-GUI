@@ -201,6 +201,7 @@ public class LocationPresentation extends Group implements SelectHelper.Selectab
         loc.invariantXProperty().bindBidirectional(controller.invariantTag.translateXProperty());
         loc.invariantYProperty().bindBidirectional(controller.invariantTag.translateYProperty());
 
+
         final Consumer<Location> updateTags = location -> {
             // Update the color
             controller.nicknameTag.bindToColor(location.colorProperty(), location.colorIntensityProperty(), true);

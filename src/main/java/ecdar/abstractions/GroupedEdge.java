@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class GroupedEdge extends DisplayableEdge {
     private final ObservableList<Edge> edges = FXCollections.observableList(new ArrayList<>());
@@ -90,12 +91,14 @@ public class GroupedEdge extends DisplayableEdge {
      * Generate and sets a unique id for this location
      */
     protected void setId() {
-        for(int counter = 0; ; counter++) {
-            if(!Ecdar.getProject().getEdgeIds().contains(String.valueOf(counter))){
-                id.set(Edge.EDGE_GROUP + counter);
-                return;
-            }
-        }
+        id.set(UUID.randomUUID().toString());
+        return;
+        // for(int counter = 0; ; counter++) {
+        //     if(!Ecdar.getProject().getEdgeIds().contains(String.valueOf(Edge.EDGE_GROUP + counter))){
+        //         id.set(Edge.EDGE_GROUP + counter);
+        //         return;
+        //     }
+        // }
     }
 
     /**

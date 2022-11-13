@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.List;
+import java.util.UUID;
 
 public abstract class DisplayableEdge implements Nearable {
     private final StringProperty id = new SimpleStringProperty("");
@@ -279,12 +280,14 @@ public abstract class DisplayableEdge implements Nearable {
      * Generate and sets a unique id for this location
      */
     protected void setId() {
-        for(int counter = 0; ; counter++) {
-            if(!Ecdar.getProject().getEdgeIds().contains(String.valueOf(counter))){
-                id.set(Edge.EDGE + counter);
-                return;
-            }
-        }
+        id.set(UUID.randomUUID().toString());
+        return;
+        // for(int counter = 0; ; counter++) {
+        //     if(!Ecdar.getProject().getEdgeIds().contains(String.valueOf(Edge.EDGE + counter))){
+        //         id.set(Edge.EDGE + counter);
+        //         return;
+        //     }
+        // }
     }
 
     /**
