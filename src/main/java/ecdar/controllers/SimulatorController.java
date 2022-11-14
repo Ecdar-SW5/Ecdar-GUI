@@ -54,8 +54,8 @@ public class SimulatorController implements Initializable {
             shouldSimulationBeReset = false;
         }
 
-        if (!firstTimeInSimulator && !new HashSet<>(overviewPresentation.getController().getComponentObservableList())
-                .containsAll(findComponentsInCurrentSimulation(SimulationInitializationDialogController.ListOfComponents))) {
+        if (!firstTimeInSimulator && !(overviewPresentation.getController().getComponentObservableList().hashCode() ==
+                findComponentsInCurrentSimulation(SimulationInitializationDialogController.ListOfComponents).hashCode())) {
             shouldSimulationBeReset = true;
         }
         

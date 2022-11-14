@@ -4,7 +4,6 @@ import EcdarProtoBuf.ComponentProtos;
 import EcdarProtoBuf.ObjectProtos;
 import EcdarProtoBuf.QueryProtos;
 import EcdarProtoBuf.ObjectProtos.Decision;
-import EcdarProtoBuf.ObjectProtos.DecisionPoint;
 import EcdarProtoBuf.ObjectProtos.Location;
 import ecdar.Ecdar;
 import ecdar.abstractions.*;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import EcdarProtoBuf.QueryProtos.SimulationInfo;
 import EcdarProtoBuf.QueryProtos.SimulationStepRequest;
 import EcdarProtoBuf.QueryProtos.SimulationStepResponse;
 
@@ -82,6 +82,8 @@ public class SimulationHandler {
         this.numberOfSteps = 0;
         this.simulationVariables.clear();
         this.simulationClocks.clear();
+        this.currentState.set(null);
+        this.selectedEdge.set(null);
         this.traceLog.clear();
         
         this.system = getSystem();
@@ -234,8 +236,8 @@ public class SimulationHandler {
                 comInfo.addComponents(ComponentProtos.Component.newBuilder().setJson(c.serialize().toString()).build());
             }
             comInfo.setComponentsHash(comInfo.getComponentsList().hashCode());
-            var simStepRequest = QueryProtos.SimulationStepRequest.newBuilder();
-            var simInfo = QueryProtos.SimulationInfo.newBuilder()
+            var simStepRequest = SimulationStepRequest.newBuilder();
+            var simInfo = SimulationInfo.newBuilder()
             .setComponentComposition(composition)
             .setComponentsInfo(comInfo);
             simStepRequest.setSimulationInfo(simInfo);
