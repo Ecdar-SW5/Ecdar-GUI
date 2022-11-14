@@ -46,7 +46,7 @@ public class TracePaneElementController implements Initializable {
         Ecdar.getSimulationHandler().getTraceLog().addListener((ListChangeListener<SimulationState>) c -> {
             while (c.next()) {
                 for (final SimulationState state : c.getAddedSubList()) {
-                    insertTraceState(state, true);
+                    if (state != null) insertTraceState(state, true);
                 }
 
                 for (final SimulationState state : c.getRemoved()) {

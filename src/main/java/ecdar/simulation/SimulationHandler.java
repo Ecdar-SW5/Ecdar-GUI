@@ -3,6 +3,8 @@ package ecdar.simulation;
 import EcdarProtoBuf.ComponentProtos;
 import EcdarProtoBuf.ObjectProtos;
 import EcdarProtoBuf.QueryProtos;
+import EcdarProtoBuf.ObjectProtos.Decision;
+import EcdarProtoBuf.ObjectProtos.DecisionPoint;
 import EcdarProtoBuf.ObjectProtos.Location;
 import ecdar.Ecdar;
 import ecdar.abstractions.*;
@@ -114,7 +116,6 @@ public class SimulationHandler {
                     System.out.println(value);
                     currentState.set(new SimulationState(value.getNewDecisionPoint()));
                     Platform.runLater(() -> traceLog.add(currentState.get()));
-                    selectedEdge.set(null);
                 }
                 
                 @Override
@@ -124,7 +125,6 @@ public class SimulationHandler {
                     SimulationStepResponse value = getStartTestData();
                     currentState.set(new SimulationState(value.getNewDecisionPoint()));
                     Platform.runLater(() -> traceLog.add(currentState.get()));
-                    selectedEdge.set(null);
                     
                     // Release backend connection
                     backendDriver.addBackendConnection(backendConnection);
@@ -196,7 +196,7 @@ public class SimulationHandler {
             Ecdar.showToast("Invalid transition");
             return;
         }
-
+        
         GrpcRequest request = new GrpcRequest(backendConnection -> {
             StreamObserver<SimulationStepResponse> responseObserver = new StreamObserver<>() {
                 @Override
@@ -205,7 +205,6 @@ public class SimulationHandler {
                     value = getNextTestData();
                     currentState.set(new SimulationState(value.getNewDecisionPoint()));
                     Platform.runLater(() -> traceLog.add(currentState.get()));
-                    selectedEdge.set(null);
                 }
                 
                 @Override
@@ -216,13 +215,12 @@ public class SimulationHandler {
                     var value = getNextTestData();
                     currentState.set(new SimulationState(value.getNewDecisionPoint()));
                     Platform.runLater(() -> traceLog.add(currentState.get()));
-                    selectedEdge.set(null);
                     
                     // Release backend connection
                     backendDriver.addBackendConnection(backendConnection);
                     connections.remove(backendConnection);
                 }
-
+                
                 @Override
                 public void onCompleted() {
                     // Release backend connection
@@ -230,7 +228,7 @@ public class SimulationHandler {
                     connections.remove(backendConnection);
                 }
             };
-
+            
             var comInfo = ComponentProtos.ComponentsInfo.newBuilder();
             for (Component c : Ecdar.getProject().getComponents()) {
                 comInfo.addComponents(ComponentProtos.Component.newBuilder().setJson(c.serialize().toString()).build());
@@ -238,24 +236,43 @@ public class SimulationHandler {
             comInfo.setComponentsHash(comInfo.getComponentsList().hashCode());
             var simStepRequest = QueryProtos.SimulationStepRequest.newBuilder();
             var simInfo = QueryProtos.SimulationInfo.newBuilder()
-                    .setComponentComposition(composition)
-                    .setComponentsInfo(comInfo);
+            .setComponentComposition(composition)
+            .setComponentsInfo(comInfo);
             simStepRequest.setSimulationInfo(simInfo);
+            var source = currentState.get().getState();
+            var specComp = ObjectProtos.SpecificComponent.newBuilder().setComponentName(getComponentName(selectedEdge.get())).setComponentIndex(getComponentIndex(selectedEdge.get()));
+            var edge = EcdarProtoBuf.ObjectProtos.Edge.newBuilder().setId(selectedEdge.get().getId()).setSpecificComponent(specComp);
+            var decision = Decision.newBuilder().setEdge(edge).setSource(source);
+            simStepRequest.setChosenDecision(decision);
+            
             backendConnection.getStub().withDeadlineAfter(this.backendDriver.getResponseDeadline(), TimeUnit.MILLISECONDS)
-                    .takeSimulationStep(simStepRequest.build(), responseObserver);
+            .takeSimulationStep(simStepRequest.build(), responseObserver);
         }, BackendHelper.getDefaultBackendInstance());
         
         backendDriver.addRequestToExecutionQueue(request);
-
-
+        
+        
         // increments the number of steps taken during this simulation
         numberOfSteps++;
-
-
+        
+        
         updateAllValues();
     }
 
+    private String getComponentName(Edge edge) {
+        return Ecdar.getProject().getComponents().stream().filter(p -> p.getEdges().contains(edge)).findFirst().get().getName();
+    }
 
+    private int getComponentIndex (Edge edge) {
+        for (int i = 0; i < Ecdar.getProject().getComponents().size(); i++) {
+            if (Ecdar.getProject().getComponents().get(i).getEdges().stream().anyMatch(p -> p.getId() == edge.getId())) {
+                return i;
+            }
+        };
+        throw new IllegalArgumentException("Edge does not belong to any component");
+    }
+    
+    
     /**
      * Updates all values and clocks that are used doing the current simulation.
      * It also stores the variables in the {@link SimulationHandler#simulationVariables}

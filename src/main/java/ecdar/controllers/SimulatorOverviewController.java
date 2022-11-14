@@ -73,6 +73,7 @@ public class SimulatorOverviewController implements Initializable {
         initializeWindowResizing();
         initializeZoom();
         initializeSimulationVariables();
+        initializeHighlighting();
         // Add the processes and group to the view
         addProcessesToGroup();
         scrollPane.setContent(groupContainer);
@@ -296,6 +297,49 @@ public class SimulatorOverviewController implements Initializable {
         }
     }
 
+        /**
+     * Initializer method to setup listeners that handle highlighting when selected/current state/transition changes
+     */
+    private void initializeHighlighting() {
+        Ecdar.getSimulationHandler().selectedEdge.addListener((observable, oldEdge, newEdge) -> {
+            unhighlightProcesses();
+        });
+
+        Ecdar.getSimulationHandler().currentState.addListener((observable, oldState, newState) -> {
+            if (newState == null) {
+                return;
+            }
+            unhighlightProcesses();
+            highlightProcessState(newState);
+            highlightAvailableEdges(newState);
+        });
+    }
+
+    /**
+     * Highlights all the processes involved in the transition.
+     * Finds the processes involved in the transition (processes with edges in the transition) and highlights their edges
+     * Also fades processes that are not active in the selected transition
+     *
+     * @param transition The transition for which we highlight the involved processes
+     */
+    public void highlightProcessTransition(final Transition transition) {
+        final var edges = transition.getEdges();
+
+        // List of all processes to show as inactive if they are not involved in a transition
+        // Processes are removed from this list, if they have an edge in the transition
+        final ArrayList<ProcessPresentation> processesToHide = new ArrayList<>(processPresentations.values());
+
+        for (final ProcessPresentation processPresentation : processPresentations.values()) {
+
+            // Find the processes that have edges involved in this transition
+            processPresentation.getController().highlightEdges(edges);
+            processesToHide.remove(processPresentation);
+        }
+
+        processesToHide.forEach(ProcessPresentation::showInactive);
+    }
+
+
     /**
      * Unhighlights all processes
      */
@@ -315,7 +359,6 @@ public class SimulatorOverviewController implements Initializable {
         if (state == null) return;
         for (int i = 0; i < state.getLocations().size(); i++) {
             final Pair<String, String> loc = state.getLocations().get(i);
-            var jj = Ecdar.getProject().getComponents();
 
             processPresentations.values().stream()
                     .filter(p -> p.getController().getComponent().getName().equals(loc.getKey()))
@@ -340,4 +383,5 @@ public class SimulatorOverviewController implements Initializable {
                             .forEach(e -> e.setIsHighlighted(true)));
         }
     }
+
 }

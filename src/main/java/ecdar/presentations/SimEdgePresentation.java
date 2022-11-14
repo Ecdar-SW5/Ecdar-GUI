@@ -35,6 +35,7 @@ public class SimEdgePresentation extends Group {
         this.setOnMouseClicked(event -> {
             if (Ecdar.getSimulationHandler().currentState.get().getEdges().contains(new Pair<>(component.getName(), edge.getId()))) {
                 Ecdar.getSimulationHandler().selectedEdge.set(edge);
+                Ecdar.getSimulationHandler().nextStep();
             }
             else {
                 Ecdar.showToast("This transition is not available in the current state");

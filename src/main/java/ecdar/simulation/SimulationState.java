@@ -3,6 +3,7 @@ package ecdar.simulation;
 import EcdarProtoBuf.ObjectProtos;
 import EcdarProtoBuf.ObjectProtos.Federation;
 import EcdarProtoBuf.ObjectProtos.State;
+import EcdarProtoBuf.QueryProtos.SimulationInfo;
 import ecdar.abstractions.Location;
 import javafx.util.Pair;
 
@@ -34,5 +35,9 @@ public class SimulationState {
     }
     public ArrayList<Pair<String, String>> getEdges() {
         return edges;
+    }
+
+    public State getState() {
+        return state;
     }
 }

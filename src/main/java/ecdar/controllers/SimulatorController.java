@@ -60,28 +60,12 @@ public class SimulatorController implements Initializable {
         }
         
         if (shouldSimulationBeReset || firstTimeInSimulator || sm.currentState.get() == null) {
-            sm.currentState.addListener((observable, oldValue, newValue) -> {
-                if (newValue == null) {
-                    return;
-                }
-                overviewPresentation.getController().unhighlightProcesses();
-                overviewPresentation.getController().highlightProcessState(newValue);
-                overviewPresentation.getController().highlightAvailableEdges(newValue);
-            });
-            
-            sm.selectedEdge.addListener((observable, oldValue, newValue) -> {
-                if (newValue == null) {
-                    return;
-                }
-                overviewPresentation.getController().unhighlightProcesses();
-                sm.nextStep();
-            });
             resetSimulation();
             sm.initialStep();
         }
 
         overviewPresentation.getController().addProcessesToGroup();
-        if (sm.currentState.get() != null) {
+        if (sm.currentState.get() != null && !shouldSimulationBeReset) {
             overviewPresentation.getController().highlightProcessState(sm.currentState.get());
             overviewPresentation.getController().highlightAvailableEdges(sm.currentState.get());
         }
