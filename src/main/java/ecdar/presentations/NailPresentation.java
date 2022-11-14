@@ -97,9 +97,13 @@ public class NailPresentation extends Group implements SelectHelper.Selectable, 
                     propertyTag.setTranslateY(controller.getNail().getPropertyY());
                 }
 
-                controller.getNail().propertyXProperty().bindBidirectional(propertyTag.translateXProperty());
-                controller.getNail().propertyYProperty().bindBidirectional(propertyTag.translateYProperty());
-
+                // Check is needed because the property cannot be bound twice
+                // which happens when switching from the simulator to the editor
+                if (!controller.getNail().propertyXProperty().isBound() && !controller.getNail().propertyYProperty().isBound()) {
+                    controller.getNail().propertyXProperty().bindBidirectional(propertyTag.translateXProperty());
+                    controller.getNail().propertyYProperty().bindBidirectional(propertyTag.translateYProperty());
+                }
+                    
                 Label propertyLabel = controller.propertyLabel;
 
                 if(propertyType.equals(Edge.PropertyType.SELECTION)) {

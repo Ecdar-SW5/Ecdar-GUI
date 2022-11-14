@@ -116,7 +116,7 @@ public class TracePaneElementController implements Initializable {
             event.consume();
             final SimulationHandler simHandler = Ecdar.getSimulationHandler();
             if (simHandler == null) return;
-            // Ecdar.getSimulationHandler().selectTransitionFromLog(state);
+            Ecdar.getSimulationHandler().selectTransitionFromLog(state);
         });
 
         EventHandler mouseEntered = transitionPresentation.getOnMouseEntered();
@@ -131,12 +131,11 @@ public class TracePaneElementController implements Initializable {
             mouseExited.handle(event);
         });
 
-
         String title = traceString(state);
         transitionPresentation.getController().setTitle(title);
 
-        // Only insert the presentation into the view if the trace is expanded
-        if (isTraceExpanded.get()) {
+        // Only insert the presentation into the view if the trace is expanded & state is not null
+        if (isTraceExpanded.get() && state != null) {
             traceList.getChildren().add(transitionPresentation);
             if (shouldAnimate) {
                 transitionPresentation.playFadeAnimation();
@@ -151,9 +150,6 @@ public class TracePaneElementController implements Initializable {
      * @return A string representing the state
      */
     private String traceString(SimulationState state) {
-        if (state == null) {
-            return "Initial state";
-        }
         StringBuilder title = new StringBuilder("(");
         int length = state.getLocations().size();
         for (int i = 0; i < length; i++) {

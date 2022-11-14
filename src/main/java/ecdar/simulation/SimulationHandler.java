@@ -376,4 +376,11 @@ public class SimulationHandler {
             con.close();
         }
     }
+
+    public void selectTransitionFromLog(SimulationState state) {
+        while (traceLog.get(traceLog.size() - 1) != state) {
+            traceLog.remove(traceLog.size() - 1);
+        }
+        currentState.set(state);
+    }
 }
