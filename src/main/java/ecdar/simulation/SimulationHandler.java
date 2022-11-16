@@ -238,8 +238,8 @@ public class SimulationHandler {
             comInfo.setComponentsHash(comInfo.getComponentsList().hashCode());
             var simStepRequest = SimulationStepRequest.newBuilder();
             var simInfo = SimulationInfo.newBuilder()
-            .setComponentComposition(composition)
-            .setComponentsInfo(comInfo);
+                    .setComponentComposition(composition)
+                    .setComponentsInfo(comInfo);
             simStepRequest.setSimulationInfo(simInfo);
             var source = currentState.get().getState();
             var specComp = ObjectProtos.SpecificComponent.newBuilder().setComponentName(getComponentName(selectedEdge.get())).setComponentIndex(getComponentIndex(selectedEdge.get()));
@@ -248,7 +248,7 @@ public class SimulationHandler {
             simStepRequest.setChosenDecision(decision);
             
             backendConnection.getStub().withDeadlineAfter(this.backendDriver.getResponseDeadline(), TimeUnit.MILLISECONDS)
-            .takeSimulationStep(simStepRequest.build(), responseObserver);
+                    .takeSimulationStep(simStepRequest.build(), responseObserver);
         }, BackendHelper.getDefaultBackendInstance());
         
         backendDriver.addRequestToExecutionQueue(request);
