@@ -23,10 +23,9 @@ public class TestFXBase extends ApplicationTest {
     }
 
     @AfterAll
-    public static void afterEachTest() throws TimeoutException {
+    public void afterEachTest() throws TimeoutException {
         FxToolkit.hideStage();
-        FxRobot robot = new FxRobot();
-        robot.release(new KeyCode[]{});
-        robot.release(new MouseButton[]{});
+        release(new KeyCode[]{});
+        release(new MouseButton[]{});
     }
 }
