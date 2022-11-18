@@ -3,12 +3,14 @@ package ecdar.simulation;
 import EcdarProtoBuf.EcdarBackendGrpc;
 import EcdarProtoBuf.ObjectProtos;
 import EcdarProtoBuf.QueryProtos;
+import EcdarProtoBuf.ObjectProtos.DecisionPoint;
+import EcdarProtoBuf.ObjectProtos.LocationTuple;
+import EcdarProtoBuf.ObjectProtos.SpecificComponent;
 import ecdar.TestFXBase;
 import ecdar.abstractions.Component;
 import ecdar.abstractions.Location;
 import io.grpc.BindableService;
 import io.grpc.ManagedChannel;
-import io.grpc.Server;
 import io.grpc.Status;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
@@ -21,9 +23,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.Assertions;
 
-public class SimulationTest extends TestFXBase {
+public class SimulationTest {
     public GrpcCleanupRule grpcCleanup = new GrpcCleanupRule();
     private final String serverName = InProcessServerBuilder.generateName();
 
