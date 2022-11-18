@@ -72,7 +72,7 @@ public final class BackendHelper {
      * @return A reachability query string
      */
     public static String getLocationReachableQuery(final Location location, final Component component) {
-        return component.getName() + "." + location.getId();
+        return component.getName() + " -> [" + location.getId() + "]()";
     }
 
     /**

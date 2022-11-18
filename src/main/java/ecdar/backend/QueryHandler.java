@@ -101,6 +101,8 @@ public class QueryHandler {
         // If the query has been cancelled, ignore the result
         if (query.getQueryState() == QueryState.UNKNOWN) return;
 
+        System.out.println(value); // TODO remember to delete this
+
         switch (value.getResponseCase()) {
             case QUERY_OK:
                 QueryProtos.QueryResponse.QueryOk queryOk = value.getQueryOk();
