@@ -14,7 +14,6 @@ import javafx.scene.layout.StackPane;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -26,7 +25,6 @@ public class SimulatorController implements Initializable {
     private boolean firstTimeInSimulator;
     private final static DoubleProperty width = new SimpleDoubleProperty(),
             height = new SimpleDoubleProperty();
-    private static ObjectProperty<Edge> selectedEdge = new SimpleObjectProperty<>();
     private static ObjectProperty<SimulationState> selectedState = new SimpleObjectProperty<>();
 
     @Override
@@ -48,12 +46,13 @@ public class SimulatorController implements Initializable {
 
 
 
-        //Have the user left a trace
+        // If the user left a trace, continue from that trace
         if (sm.traceLog.size() >= 2) {
             shouldSimulationBeReset = false;
         }
 
-        if (!firstTimeInSimulator && !(overviewPresentation.getController().getComponentObservableList().hashCode() ==
+        // If the composition is not the same as previous simulation, reset the simulation
+        if (!(overviewPresentation.getController().getComponentObservableList().hashCode() ==
                 findComponentsInCurrentSimulation(SimulationInitializationDialogController.ListOfComponents).hashCode())) {
             shouldSimulationBeReset = true;
         }
@@ -64,6 +63,8 @@ public class SimulatorController implements Initializable {
         }
 
         overviewPresentation.getController().addProcessesToGroup();
+
+        // If the simulation continues, highligt the current state and available edges
         if (sm.currentState.get() != null && !shouldSimulationBeReset) {
             overviewPresentation.getController().highlightProcessState(sm.currentState.get());
             overviewPresentation.getController().highlightAvailableEdges(sm.currentState.get());
@@ -132,19 +133,6 @@ public class SimulatorController implements Initializable {
 
     public static DoubleProperty getHeightProperty() {
         return height;
-    }
-
-
-    public static ObjectProperty<Edge> getSelectedTransitionProperty() {
-        return selectedEdge;
-    }
-
-    public static void setSelectedTransition(Edge selectedEdge) {
-        SimulatorController.selectedEdge.set(selectedEdge);
-    }
-
-    public static ObjectProperty<SimulationState> getSelectedStateProperty() {
-        return selectedState;
     }
 
     public static void setSelectedState(SimulationState selectedState) {
