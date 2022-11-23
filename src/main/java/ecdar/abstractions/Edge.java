@@ -207,9 +207,6 @@ public class Edge extends DisplayableEdge implements Serializable {
         }
 
         ioStatus = new SimpleObjectProperty<>(EdgeStatus.valueOf(json.getAsJsonPrimitive(STATUS).getAsString()));
-
-        final JsonPrimitive IDJson = json.getAsJsonPrimitive(ID);
-        if (IDJson != null) setId(IDJson.getAsString());
         setId();
 
         final JsonPrimitive groupJson = json.getAsJsonPrimitive(GROUP);
