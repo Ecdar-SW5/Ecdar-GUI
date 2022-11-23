@@ -1,15 +1,11 @@
 package ecdar.simulation;
 
 import EcdarProtoBuf.ObjectProtos;
-import EcdarProtoBuf.ObjectProtos.Federation;
 import EcdarProtoBuf.ObjectProtos.State;
-import EcdarProtoBuf.QueryProtos.SimulationInfo;
-import ecdar.abstractions.Location;
+import ecdar.Ecdar;
 import javafx.util.Pair;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public class SimulationState {
     // key = component name, value = id
@@ -24,6 +20,9 @@ public class SimulationState {
         }
 
         edges = new ArrayList<>();
+        if (decisionPoint.getEdgesList().isEmpty()) {
+            Ecdar.showToast("No available transitions.");
+        }
         for (ObjectProtos.Edge edge : decisionPoint.getEdgesList()) {
             edges.add(new Pair<>(edge.getSpecificComponent().getComponentName(), edge.getId()));
         }

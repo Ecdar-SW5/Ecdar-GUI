@@ -89,21 +89,6 @@ public class SimulationHandler {
         this.system = getSystem();
     }
 
-    private SimulationStepResponse getStartTestData(){
-        var response = SimulationStepResponse.newBuilder();
-        var decisionPoint = ObjectProtos.DecisionPoint.newBuilder();
-        var state = ObjectProtos.State.newBuilder();
-        var specComp = ObjectProtos.SpecificComponent.newBuilder().setComponentName("Researcher").setComponentIndex(1);
-        var locationTuple = ObjectProtos.LocationTuple.newBuilder()
-            .addLocations(Location.newBuilder().setId(Ecdar.getProject().getComponents().stream().filter(p -> p.getName().equals("Researcher")).findFirst().get().getLocations().get(0).getId()).setSpecificComponent(specComp));
-        state.setLocationTuple(locationTuple);
-        decisionPoint.setSource(state);
-        decisionPoint.addEdges(ObjectProtos.Edge.newBuilder().setId(Ecdar.getProject().getComponents().stream().filter(p -> p.getName().equals("Researcher")).findFirst().get().getEdges().get(3).getId()).setSpecificComponent(specComp));
-        decisionPoint.addEdges(ObjectProtos.Edge.newBuilder().setId(Ecdar.getProject().getComponents().stream().filter(p -> p.getName().equals("Researcher")).findFirst().get().getEdges().get(7).getId()).setSpecificComponent(specComp));
-        response.setNewDecisionPoint(decisionPoint);
-        return response.build();
-    }
-
 
     /**
      * Reloads the whole simulation sets the initial transitions, states, etc
@@ -115,18 +100,13 @@ public class SimulationHandler {
             StreamObserver<SimulationStepResponse> responseObserver = new StreamObserver<>() {
                 @Override
                 public void onNext(QueryProtos.SimulationStepResponse value) {
-                    System.out.println(value);
                     currentState.set(new SimulationState(value.getNewDecisionPoint()));
                     Platform.runLater(() -> traceLog.add(currentState.get()));
                 }
                 
                 @Override
                 public void onError(Throwable t) {
-                    System.out.println(t.getMessage());
-                    Ecdar.showToast("Could not start simulation");
-                    SimulationStepResponse value = getStartTestData();
-                    currentState.set(new SimulationState(value.getNewDecisionPoint()));
-                    Platform.runLater(() -> traceLog.add(currentState.get()));
+                    Ecdar.showToast("Could not start simulation:\n" + t.getMessage());
                     
                     // Release backend connection
                     backendDriver.addBackendConnection(backendConnection);
@@ -173,22 +153,6 @@ public class SimulationHandler {
         initialStep();
     }
 
-    
-    private SimulationStepResponse getNextTestData(){
-        var response = SimulationStepResponse.newBuilder();
-        var decisionPoint = ObjectProtos.DecisionPoint.newBuilder();
-        var state = ObjectProtos.State.newBuilder();
-        var specComp = ObjectProtos.SpecificComponent.newBuilder().setComponentName("Researcher").setComponentIndex(1);
-        var locationTuple = ObjectProtos.LocationTuple.newBuilder()
-            .addLocations(Location.newBuilder().setId(Ecdar.getProject().getComponents().stream().filter(p -> p.getName().equals("Researcher")).findFirst().get().getLocations().get(2).getId()).setSpecificComponent(specComp));
-        state.setLocationTuple(locationTuple);
-        decisionPoint.setSource(state);
-        decisionPoint.addEdges(ObjectProtos.Edge.newBuilder().setId(Ecdar.getProject().getComponents().stream().filter(p -> p.getName().equals("Researcher")).findFirst().get().getEdges().get(4).getId()).setSpecificComponent(specComp));
-        decisionPoint.addEdges(ObjectProtos.Edge.newBuilder().setId(Ecdar.getProject().getComponents().stream().filter(p -> p.getName().equals("Researcher")).findFirst().get().getEdges().get(10).getId()).setSpecificComponent(specComp));
-        response.setNewDecisionPoint(decisionPoint);
-        return response.build();
-    }
-
     /**
      * Take a step in the simulation.
      */
@@ -203,20 +167,13 @@ public class SimulationHandler {
             StreamObserver<SimulationStepResponse> responseObserver = new StreamObserver<>() {
                 @Override
                 public void onNext(QueryProtos.SimulationStepResponse value) {
-                    System.out.println(value);
-                    value = getNextTestData();
                     currentState.set(new SimulationState(value.getNewDecisionPoint()));
                     Platform.runLater(() -> traceLog.add(currentState.get()));
                 }
                 
                 @Override
                 public void onError(Throwable t) {
-                    currentState.set(null);
-                    System.out.println(t.getMessage());
                     Ecdar.showToast("Could not take next step in simulation\nError: " + t.getMessage());
-                    var value = getNextTestData();
-                    currentState.set(new SimulationState(value.getNewDecisionPoint()));
-                    Platform.runLater(() -> traceLog.add(currentState.get()));
                     
                     // Release backend connection
                     backendDriver.addBackendConnection(backendConnection);
@@ -246,7 +203,7 @@ public class SimulationHandler {
             var edge = EcdarProtoBuf.ObjectProtos.Edge.newBuilder().setId(selectedEdge.get().getId()).setSpecificComponent(specComp);
             var decision = Decision.newBuilder().setEdge(edge).setSource(source);
             simStepRequest.setChosenDecision(decision);
-            
+
             backendConnection.getStub().withDeadlineAfter(this.backendDriver.getResponseDeadline(), TimeUnit.MILLISECONDS)
                     .takeSimulationStep(simStepRequest.build(), responseObserver);
         }, BackendHelper.getDefaultBackendInstance());
