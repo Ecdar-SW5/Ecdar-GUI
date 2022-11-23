@@ -34,19 +34,12 @@ import EcdarProtoBuf.QueryProtos.SimulationStepResponse;
  */
 public class SimulationHandler {
     public static final String QUERY_PREFIX = "Query: ";
-    public String composition;
+    private String composition;
     public ObjectProperty<SimulationState> currentState = new SimpleObjectProperty<>();
     public ObjectProperty<SimulationState> initialState = new SimpleObjectProperty<>();
     public ObjectProperty<Edge> selectedEdge = new SimpleObjectProperty<>();
     private EcdarSystem system;
     private int numberOfSteps;
-
-    /**
-     * A string to keep track what is currently being simulated
-     * For now the string is prefixed with {@link #QUERY_PREFIX} when doing a query simulation
-     * and kept empty when doing system simulations
-     */
-    public String currentSimulation = "";
 
     private final ObservableMap<String, BigDecimal> simulationVariables = FXCollections.observableHashMap();
     private final ObservableMap<String, BigDecimal> simulationClocks = FXCollections.observableHashMap();
@@ -69,9 +62,6 @@ public class SimulationHandler {
     /**
      * Initializes the default system (non-query system)
      */
-    public void initializeDefaultSystem() {
-        currentSimulation = "";
-    }
 
     /**
      * Initializes the values and properties in the {@link SimulationHandler}.
@@ -335,9 +325,9 @@ public class SimulationHandler {
         return system;
     }
 
-    public String getCurrentSimulation() {
-        return currentSimulation;
-    }
+    public String getComposition() { return composition;}
+
+    public void setComposition(String composition) {this.composition = composition;}
 
     public boolean isSimulationRunning() {
         return false; // ToDo: Implement

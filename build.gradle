@@ -10,6 +10,20 @@ javafx {
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.swing']
 }
 
+run {
+    mainClassName = 'com.jfxbase/com.jfxbase.sample.Main'
+    applicationDefaultJvmArgs += [
+            "--add-opens", "javafx.graphics/javafx.css=ALL-UNNAMED",
+            "--add-opens", "javafx.base/com.sun.javafx.runtime=ALL-UNNAMED",
+            "--add-opens", "javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED",
+            "--add-opens", "javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED",
+            "--add-opens", "javafx.base/com.sun.javafx.binding=ALL-UNNAMED",
+            "--add-opens", "javafx.base/com.sun.javafx.event=ALL-UNNAMED",
+            "--add-opens", "javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED",
+            "--add-opens", "javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED",
+    ]
+}
+
 group 'ecdar'
 if (project.hasProperty('ecdarVersion')) {
     version = project.ecdarVersion
@@ -78,6 +92,7 @@ dependencies {
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.2'
     testImplementation group: 'org.testfx', name: 'testfx-junit', version: '4.0.15-alpha'
     testImplementation group: 'org.testfx', name: 'openjfx-monocle', version: 'jdk-12.0.1+2'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.8.2'
 }
 
 
