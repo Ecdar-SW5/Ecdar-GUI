@@ -144,7 +144,6 @@ public class TransitionPaneElementController implements Initializable {
 
         EventHandler mouseExited = transitionPresentation.getOnMouseExited();
         transitionPresentation.setOnMouseExited(event -> {
-            SimulatorController.setSelectedTransition(null);
             mouseExited.handle(event);
         });
 
@@ -200,8 +199,7 @@ public class TransitionPaneElementController implements Initializable {
      */
     @FXML
     private void refreshTransitions() {
-        SimulatorController.setSelectedTransition(null);
-//        MainController.openReloadSimulationDialog();         // ToDo: Implement
+        Ecdar.getSimulationHandler().resetToInitialLocation();
     }
 
     /**

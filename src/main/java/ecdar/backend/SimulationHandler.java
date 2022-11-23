@@ -43,11 +43,6 @@ public class SimulationHandler {
 
     private final ObservableMap<String, BigDecimal> simulationVariables = FXCollections.observableHashMap();
     private final ObservableMap<String, BigDecimal> simulationClocks = FXCollections.observableHashMap();
-    /**
-     * For some reason the successor.getTransitions() only sometimes returns some of the transitions
-     * that are available, when running the initial step.
-     * That is why we need to keep track of the initial transitions.
-     */
     public ObservableList<SimulationState> traceLog = FXCollections.observableArrayList();
     private final BackendDriver backendDriver;
     private final ArrayList<BackendConnection> connections = new ArrayList<>();
@@ -59,9 +54,6 @@ public class SimulationHandler {
         this.backendDriver = backendDriver;
     }
 
-    /**
-     * Initializes the default system (non-query system)
-     */
 
     /**
      * Initializes the values and properties in the {@link SimulationHandler}.
