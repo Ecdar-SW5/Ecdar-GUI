@@ -4,7 +4,7 @@ import com.jfoenix.controls.JFXRippler;
 import com.jfoenix.controls.JFXTextField;
 import ecdar.Ecdar;
 import ecdar.abstractions.Edge;
-import ecdar.simulation.SimulationHandler;
+import ecdar.backend.SimulationHandler;
 import ecdar.simulation.Transition;
 import ecdar.presentations.TransitionPresentation;
 import javafx.beans.property.SimpleBooleanProperty;

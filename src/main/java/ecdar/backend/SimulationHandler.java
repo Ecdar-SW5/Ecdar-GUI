@@ -1,4 +1,4 @@
-package ecdar.simulation;
+package ecdar.backend;
 
 import EcdarProtoBuf.ComponentProtos;
 import EcdarProtoBuf.ObjectProtos;
@@ -8,6 +8,7 @@ import EcdarProtoBuf.ObjectProtos.Location;
 import ecdar.Ecdar;
 import ecdar.abstractions.*;
 import ecdar.backend.*;
+import ecdar.simulation.SimulationState;
 import io.grpc.stub.StreamObserver;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;

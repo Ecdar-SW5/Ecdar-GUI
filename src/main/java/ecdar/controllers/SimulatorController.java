@@ -2,9 +2,9 @@ package ecdar.controllers;
 
 import ecdar.Ecdar;
 import ecdar.abstractions.*;
+import ecdar.backend.SimulationHandler;
 import ecdar.presentations.SimulationInitializationDialogPresentation;
 import ecdar.presentations.SimulatorOverviewPresentation;
-import ecdar.simulation.SimulationHandler;
 import ecdar.simulation.SimulationState;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
