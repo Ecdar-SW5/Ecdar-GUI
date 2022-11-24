@@ -1,6 +1,5 @@
 package ecdar.abstractions;
 
-import ecdar.Ecdar;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;

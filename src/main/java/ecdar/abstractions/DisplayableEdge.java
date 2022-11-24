@@ -1,6 +1,5 @@
 package ecdar.abstractions;
 
-import ecdar.Ecdar;
 import ecdar.code_analysis.Nearable;
 import ecdar.presentations.Grid;
 import ecdar.utility.colors.Color;
