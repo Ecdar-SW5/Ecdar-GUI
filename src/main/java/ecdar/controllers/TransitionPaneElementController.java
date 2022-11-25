@@ -43,17 +43,6 @@ public class TransitionPaneElementController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Ecdar.getSimulationHandler().availableTransitions.addListener((ListChangeListener<Transition>) c -> {
-        //     while (c.next()) {
-        //         for (Transition trans : c.getAddedSubList()) insertTransition(trans);
-
-        //         for (final Transition trans: c.getRemoved()) {
-        //             transitionList.getChildren().remove(transitionPresentationMap.get(trans));
-        //             transitionPresentationMap.remove(trans);
-        //         }
-        //     }
-        // });
-
         initializeTransitionExpand();
         initializeDelayChooser();
     }
@@ -192,11 +181,10 @@ public class TransitionPaneElementController implements Initializable {
     }
 
     /**
-     * Gets the initial step from the SimulationHandler.
-     * Used by the refresh button.
+     * Restart simulation to the initial step.
      */
     @FXML
-    private void refreshTransitions() {
+    private void restartSimulation() {
         Ecdar.getSimulationHandler().resetToInitialLocation();
     }
 
