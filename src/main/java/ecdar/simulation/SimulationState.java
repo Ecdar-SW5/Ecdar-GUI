@@ -8,7 +8,7 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 
 public class SimulationState {
-    // key = component name, value = id
+    // locations and edges are saved as key-value pair where key is component name and value = id
     private final ArrayList<Pair<String, String>> locations;
     private final ArrayList<Pair<String, String>> edges;
     private final State state;
