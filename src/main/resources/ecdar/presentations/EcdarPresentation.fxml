@@ -252,7 +252,7 @@
     </StackPane>
 
     <!-- Message container -->
-    <MessageTabPanePresentation fx:id="messageTabPane" StackPane.alignment="BOTTOM_CENTER"/>
+    <!--<MessageTabPanePresentation fx:id="messageTabPane" StackPane.alignment="BOTTOM_CENTER"/>-->
 
     <!-- Status container -->
     <HBox minHeight="20" maxHeight="20" StackPane.alignment="BOTTOM_CENTER"
