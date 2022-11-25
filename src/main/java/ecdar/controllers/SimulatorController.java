@@ -83,26 +83,8 @@ public class SimulatorController implements Initializable {
         overviewPresentation.getController().getComponentObservableList().clear();
         overviewPresentation.getController().getComponentObservableList().addAll(listOfComponentsForSimulation);
         firstTimeInSimulator = false;
-
-        //Method that colors all initial states.
-        initialstatelighter(listOfComponentsForSimulation);
     }
     
-    private void initialstatelighter(List<Component> listofComponents){
-        for(Component comp: listofComponents)
-        {
-            Location initiallocation = comp.getInitialLocation();
-            initiallocation.setColor(Color.ORANGE);
-            List<DisplayableEdge> tempedge = comp.getRelatedEdges(initiallocation);
-            /* for(DisplayableEdge e: tempedge)
-            {
-                if(e.getSourceLocation() == initiallocation)
-                {
-                    e.setIsHighlighted(true);
-                }
-            }*/
-        }
-    }
     /**
      * Finds the components that are used in the current simulation by looking at the components found in
      * Ecdar.getProject.getComponents() and compares them to the components found in the queryComponents list
