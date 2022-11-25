@@ -12,7 +12,6 @@ public class MessageTabPanePresentation extends StackPane {
 
     public MessageTabPanePresentation() {
         controller = new EcdarFXMLLoader().loadAndGetController("MessageTabPanePresentation.fxml", this);
-        /*initializeMessageContainer();*/
     }
 
     public MessageTabPaneController getController() {

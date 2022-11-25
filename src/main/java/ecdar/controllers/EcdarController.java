@@ -1191,20 +1191,6 @@ public class EcdarController implements Initializable {
         throw new IllegalArgumentException("Image is all white");
     }
 
-    /**
-     * This method is used to push the contents of the project and query panes when the tab pane is opened, but the tab pane is outdated
-     */
-   /* private void changeInsetsOfProjectAndQueryPanes() {
-        if (messageTabPane.getController().isOpen()) {
-            projectPane.showBottomInset(false);
-            queryPane.showBottomInset(false);
-            CanvasPresentation.showBottomInset(false);
-        } else {
-            projectPane.showBottomInset(true);
-            queryPane.showBottomInset(true);
-            CanvasPresentation.showBottomInset(true);
-        }
-    }*/
 
     private void nudgeSelected(final NudgeDirection direction) {
         final List<SelectHelper.ItemSelectable> selectedElements = SelectHelper.getSelectedElements();
