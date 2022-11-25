@@ -116,7 +116,7 @@ public class TracePaneElementController implements Initializable {
             event.consume();
             final SimulationHandler simHandler = Ecdar.getSimulationHandler();
             if (simHandler == null) return;
-            Ecdar.getSimulationHandler().selectTransitionFromLog(state);
+            Ecdar.getSimulationHandler().selectStateFromLog(state);
         });
 
         EventHandler mouseEntered = transitionPresentation.getOnMouseEntered();

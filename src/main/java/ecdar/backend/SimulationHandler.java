@@ -334,7 +334,11 @@ public class SimulationHandler {
         }
     }
 
-    public void selectTransitionFromLog(SimulationState state) {
+
+    /**
+     * Sets the current state of the simulation to the given state from the trace log
+     */
+    public void selectStateFromLog(SimulationState state) {
         while (traceLog.get(traceLog.size() - 1) != state) {
             traceLog.remove(traceLog.size() - 1);
         }
