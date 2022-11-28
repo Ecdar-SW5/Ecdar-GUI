@@ -120,10 +120,6 @@ public class SimulatorController implements Initializable {
 
     public void willHide() {
         overviewPresentation.getController().removeProcessesFromGroup();
-        overviewPresentation.getController().getComponentObservableList().forEach(component -> {
-            // Previously reset coordinates of component box
-        });
-        // overviewPresentation.getController().unhighlightProcesses();
     }
 
     public static DoubleProperty getWidthProperty() {

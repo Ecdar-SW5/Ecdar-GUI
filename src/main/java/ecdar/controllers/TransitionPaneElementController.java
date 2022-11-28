@@ -134,16 +134,6 @@ public class TransitionPaneElementController implements Initializable {
             mouseExited.handle(event);
         });
 
-        // transitionPresentation.setOnMouseClicked(event -> {
-        //     event.consume();
-
-        //     // Performs the next step of the simulation when clicking on a transition
-        //     SimulationHandler simHandler = Ecdar.getSimulationHandler();
-        //     if (simHandler != null) {
-        //         // simHandler.nextStep(transitionPresentation.getController().getTransition(), this.delay.get());
-        //     }
-        // });
-
         transitionPresentationMap.put(transition, transitionPresentation);
 
         // Only insert the presentation into the view if the transitions are expanded

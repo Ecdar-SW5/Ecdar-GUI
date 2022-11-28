@@ -60,7 +60,6 @@ public class EcdarController implements Initializable {
     public StackPane leftPane;
     public StackPane rightPane;
     public Rectangle bottomFillerElement;
-    /*public MessageTabPanePresentation messageTabPane;*/
     public StackPane modellingHelpDialogContainer;
     public JFXDialog modellingHelpDialog;
     public StackPane modalBar;
@@ -179,9 +178,6 @@ public class EcdarController implements Initializable {
         initializeStatusBar();
         initializeMenuBar();
         startBackgroundQueriesThread(); // Will terminate immediately if background queries are turned off
-
-        /*bottomFillerElement.heightProperty().bind(messageTabPane.maxHeightProperty());*/
-        /*messageTabPane.getController().setRunnableForOpeningAndClosingMessageTabPane(this::changeInsetsOfProjectAndQueryPanes);*/
 
         // Update file coloring when active model changes
         editorPresentation.getController().getActiveCanvasPresentation().getController().activeComponentProperty().addListener(observable -> projectPane.getController().updateColorsOnFilePresentations());
@@ -726,7 +722,6 @@ public class EcdarController implements Initializable {
 
         scaleIcons(root, newCalculatedScale);
         editorPresentation.getController().scaleEdgeStatusToggle(newCalculatedScale);
-        /*messageTabPane.getController().updateScale(newScale);*/
 
         // Update listeners of UI scale
         scalingProperty.set(newScale);
