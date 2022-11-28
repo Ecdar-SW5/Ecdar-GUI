@@ -76,7 +76,7 @@ public final class BackendHelper {
         var stringBuilder = new StringBuilder();
 
         // append simulation query
-        stringBuilder.append(getSimulationQueryString(query));
+        stringBuilder.append(query);
 
         // append start location here TODO
 
@@ -90,10 +90,6 @@ public final class BackendHelper {
 
         //  return example: m1||M2->[L1,L4](y<3);[L2, L7](y<2)
         return stringBuilder.toString();
-    }
-
-    private static String getSimulationQueryString(String query) {
-        return query.replace("(", "").replace(")", "");
     }
 
     private static String getEndStateString(String componentName, String endLocationId) {
