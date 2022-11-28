@@ -24,7 +24,7 @@ public class SimulationState {
             Ecdar.showToast("No available transitions.");
         }
         for (ObjectProtos.Edge edge : decisionPoint.getEdgesList()) {
-            edges.add(new Pair<>(edge.getSpecificComponent().getComponentName(), edge.getId()));
+            edges.add(new Pair<>(getComponentName(edge.getId()), edge.getId()));
         }
         state = decisionPoint.getSource();
     }
@@ -38,5 +38,17 @@ public class SimulationState {
 
     public State getState() {
         return state;
+    }
+
+    private String getComponentName(String id) {
+        var components = Ecdar.getProject().getComponents();
+        for (var component : components) {
+            for (var edge : component.getEdges()) {
+                if (edge.getId().equals(id)) {
+                    return component.getName();
+                }
+            }
+        }
+        throw new RuntimeException("Could not find component name for edge with id " + id);
     }
 }

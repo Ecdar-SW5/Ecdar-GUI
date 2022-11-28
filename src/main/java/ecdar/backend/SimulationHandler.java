@@ -138,12 +138,6 @@ public class SimulationHandler {
      * Take a step in the simulation.
      */
     public void nextStep() {
-        // check if the edge is a valid transition
-        if (!currentState.get().getEdges().stream().anyMatch(e -> e.getValue() == selectedEdge.get().getId())) {
-            Ecdar.showToast("Invalid transition");
-            return;
-        }
-        
         GrpcRequest request = new GrpcRequest(backendConnection -> {
             StreamObserver<SimulationStepResponse> responseObserver = new StreamObserver<>() {
                 @Override
@@ -200,7 +194,15 @@ public class SimulationHandler {
     }
 
     private String getComponentName(Edge edge) {
-        return Ecdar.getProject().getComponents().stream().filter(p -> p.getEdges().contains(edge)).findFirst().get().getName();
+        var components = Ecdar.getProject().getComponents();
+        for (var component : components) {
+            for (var e : component.getEdges()) {
+                if (e.getId().equals(edge.getId())) {
+                    return component.getName();
+                }
+            }
+        }
+        throw new RuntimeException("Could not find component name for edge with id " + edge.getId());
     }
 
     private int getComponentIndex (Edge edge) {
