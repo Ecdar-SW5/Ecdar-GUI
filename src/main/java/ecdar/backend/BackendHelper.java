@@ -3,6 +3,7 @@ package ecdar.backend;
 import EcdarProtoBuf.ComponentProtos;
 import ecdar.Ecdar;
 import ecdar.abstractions.*;
+import ecdar.simulation.SimulationState;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -66,36 +67,78 @@ public final class BackendHelper {
         Ecdar.getProject().getQueries().forEach(Query::cancel);
     }
 
-    /**
-     * Generates a reachability query based on the given location and component
-     *
-     * @param endLocation  The location which should be checked for reachability
-     * @return A reachability query string
-     */
     public static String getLocationReachableQuery(final Location endLocation, final Component component, final String query) {
+        return getLocationReachableQuery(endLocation, component, query, null);
+    }
+        /**
+         * Generates a reachability query based on the given location and component
+         *
+         * @param endLocation  The location which should be checked for reachability
+         * @return A reachability query string
+         */
+    public static String getLocationReachableQuery(final Location endLocation, final Component component, final String query, final SimulationState state) {
         var stringBuilder = new StringBuilder();
 
         // append simulation query
         stringBuilder.append(query);
 
+        // append arrow
+        stringBuilder.append(" -> ");
+
         // append start location here TODO
+        if (state != null){
+            stringBuilder.append(getStartStateString(state));
+            stringBuilder.append(";");
+        }
 
         // append end state
         stringBuilder.append(getEndStateString(component.getName(), endLocation.getId()));
 
-        // append clocks
-        stringBuilder.append("(");
-        // append clock here TODO
-        stringBuilder.append(")");
-
         //  return example: m1||M2->[L1,L4](y<3);[L2, L7](y<2)
+        System.out.println(stringBuilder);
+        return stringBuilder.toString();
+    }
+
+    private static String getStartStateString(SimulationState state) {
+        var stringBuilder = new StringBuilder();
+
+        // append locations
+        var locations = state.getLocations();
+        stringBuilder.append("[");
+        var appendLocationWithSeparator = false;
+        for(var componentName:ListOfComponents){
+            var locationFound = false;
+
+            for(var location:locations){
+                if (location.getKey().equals(componentName)){
+                    if (appendLocationWithSeparator){
+                        stringBuilder.append("," + location.getValue());
+                    }
+                    else{
+                        stringBuilder.append(location.getValue());
+                    }
+                    locationFound = true;
+                }
+                if (locationFound){
+                    // don't go through more locations, when a location is found for the specific component that we're looking at
+                    break;
+                }
+            }
+            appendLocationWithSeparator = true;
+        }
+        stringBuilder.append("]");
+
+        // append clock values
+        var clocks = state.getSimulationClocks();
+        stringBuilder.append("()");
+
         return stringBuilder.toString();
     }
 
     private static String getEndStateString(String componentName, String endLocationId) {
         var stringBuilder = new StringBuilder();
 
-        stringBuilder.append(" -> [");
+        stringBuilder.append("[");
         var appendLocationWithSeparator = false;
 
         for (var component:ListOfComponents)
@@ -121,6 +164,7 @@ public final class BackendHelper {
             }
         }
         stringBuilder.append("]");
+        stringBuilder.append("()");
 
         return stringBuilder.toString();
     }

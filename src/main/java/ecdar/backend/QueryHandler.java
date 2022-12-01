@@ -172,7 +172,7 @@ public class QueryHandler {
                             query.getSuccessConsumer().accept(true);
                         } else {
                             query.setQueryState(QueryState.ERROR);
-                            Ecdar.showToast("Reachability check was unsuccessful!");
+                            Ecdar.showToast("Error from backend: Reachability check was unsuccessful!");
                             query.getFailureConsumer().accept(new BackendException.QueryErrorException(queryOk.getReachability().getReason()));
                             query.getSuccessConsumer().accept(false);
                             //ToDo: These errors are not implemented in the Reveaal backend.
@@ -220,7 +220,7 @@ public class QueryHandler {
 
         // due to lack of information from backend if the reachability check shows that a location can NOT be reached, this is the most accurate information we can provide
         if(query.getType() == QueryType.REACHABILITY){
-            Ecdar.showToast("The reachability query failed. This might be due to the fact that the location is not reachable.");
+            Ecdar.showToast("Timeout (no response from backend): The reachability query failed. This might be due to the fact that the location is not reachable.");
         }
 
         // Each error starts with a capitalized description of the error equal to the gRPC error type encountered

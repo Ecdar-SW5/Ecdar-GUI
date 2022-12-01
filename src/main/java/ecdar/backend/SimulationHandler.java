@@ -298,6 +298,10 @@ public class SimulationHandler {
         return simulationClocks;
     }
 
+    public SimulationState getCurrentState() {
+        return currentState.get();
+    }
+
     /**
      * The initial state of the current simulation
      *
@@ -335,7 +339,6 @@ public class SimulationHandler {
             con.close();
         }
     }
-
 
     /**
      * Sets the current state of the simulation to the given state from the trace log
