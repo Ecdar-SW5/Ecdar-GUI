@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import EcdarProtoBuf.QueryProtos.SimulationInfo;
 import EcdarProtoBuf.QueryProtos.SimulationStepRequest;
 import EcdarProtoBuf.QueryProtos.SimulationStepResponse;
+import org.checkerframework.checker.units.qual.A;
 
 /**
  * Handles state changes, updates of values / clocks, and keeps track of all the transitions that
@@ -38,7 +39,7 @@ public class SimulationHandler {
     public ObjectProperty<Edge> selectedEdge = new SimpleObjectProperty<>();
     private EcdarSystem system;
     private int numberOfSteps;
-
+    private ArrayList<Component> simulationComponents = new ArrayList<>();
     private final ObservableMap<String, BigDecimal> simulationVariables = FXCollections.observableHashMap();
     private final ObservableMap<String, BigDecimal> simulationClocks = FXCollections.observableHashMap();
     public ObservableList<SimulationState> traceLog = FXCollections.observableArrayList();
@@ -51,7 +52,6 @@ public class SimulationHandler {
     public SimulationHandler(BackendDriver backendDriver) {
         this.backendDriver = backendDriver;
     }
-
 
     /**
      * Initializes the values and properties in the {@link SimulationHandler}.
@@ -346,4 +346,28 @@ public class SimulationHandler {
         }
         currentState.set(state);
     }
+
+    public void setSimulationComponents(ArrayList<Component> components){
+        simulationComponents = components;
+    }
+
+    public ArrayList<Component> getSimulationComponents(){
+        return simulationComponents;
+    }
+
+    //i know det er pænt dårligt det her haha - skal lige rettes men gider ikke mere nu.. XD
+    public void test(ArrayList<String> ids){
+            for(var comp : simulationComponents){
+                for(var edge : comp.getEdges()){
+                    for(var id : ids){
+                    System.out.println("ID " + id.replace("edge_ids: \"", "").replace("\"", ""));
+                    System.out.println("EDGEID " + edge.getId());
+                    if(edge.getId().equals(id)){
+                        edge.setIsHighlighted(true);
+                    }
+                }
+            }
+        }
+    }
+
 }

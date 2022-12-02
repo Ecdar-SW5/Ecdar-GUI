@@ -165,6 +165,16 @@ public class QueryHandler {
                             query.setQueryState(QueryState.SUCCESSFUL);
                             if(value.getQueryOk().getReachability().getSuccess()){
                                 Ecdar.showToast("Reachability check was successful and the location can be reached.");
+
+                                //create list of edge id's
+                                ArrayList<String> edgeIds = new ArrayList<>();
+                                for(var pathsList : value.getQueryOk().getReachability().getComponentPathsList()){
+                                    for(var id : pathsList.getEdgeIdsList().toArray()) {
+                                        edgeIds.add(id.toString());
+                                    }
+                                }
+                                //TODO fix test method and rename :))
+                                Ecdar.getSimulationHandler().test(edgeIds);
                             }
                             else if(!value.getQueryOk().getReachability().getSuccess()){
                                 Ecdar.showToast("Reachability check was successful but the location cannot be reached.");
