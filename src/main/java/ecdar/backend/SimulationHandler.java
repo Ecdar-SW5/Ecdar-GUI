@@ -225,7 +225,7 @@ public class SimulationHandler {
     }
 
     /**
-     * Sets the value of simulation variables and clocks, based on {@link SimulationHandler#currentConcreteState}
+     * Sets the value of simulation variables and clocks, based on currentConcreteState
      */
     private void setSimVarAndClocks() {
         // The variables and clocks are all found in the getVariables array
@@ -360,7 +360,7 @@ public class SimulationHandler {
             for(var comp : simulationComponents){
                 for(var edge : comp.getEdges()){
                     for(var id : ids){
-                    System.out.println("ID " + id.replace("edge_ids: \"", "").replace("\"", ""));
+                    System.out.println("ID " + id);
                     System.out.println("EDGEID " + edge.getId());
                     if(edge.getId().equals(id)){
                         edge.setIsHighlighted(true);
