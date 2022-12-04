@@ -173,8 +173,8 @@ public class QueryHandler {
                                         edgeIds.add(id.toString());
                                     }
                                 }
-                                //TODO fix test method and rename :))
-                                Ecdar.getSimulationHandler().test(edgeIds);
+                                //highlight the edges
+                                Ecdar.getSimulationHandler().highlightReachabilityEdges(edgeIds);
                             }
                             else if(!value.getQueryOk().getReachability().getSuccess()){
                                 Ecdar.showToast("Reachability check was successful but the location cannot be reached.");

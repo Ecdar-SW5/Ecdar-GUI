@@ -347,21 +347,28 @@ public class SimulationHandler {
         currentState.set(state);
     }
 
+    /**
+     * Set list of components used in the simulation
+     */
     public void setSimulationComponents(ArrayList<Component> components){
         simulationComponents = components;
     }
 
+    /**
+     * Get list of components used in the simulation
+     */
     public ArrayList<Component> getSimulationComponents(){
         return simulationComponents;
     }
 
-    //i know det er pænt dårligt det her haha - skal lige rettes men gider ikke mere nu.. XD
-    public void test(ArrayList<String> ids){
-            for(var comp : simulationComponents){
-                for(var edge : comp.getEdges()){
-                    for(var id : ids){
-                    System.out.println("ID " + id);
-                    System.out.println("EDGEID " + edge.getId());
+    /**
+     * Highlights the edges from the reachability response
+     */
+    public void highlightReachabilityEdges(ArrayList<String> ids){
+        //TODO unhighlight edges from previous reachability response
+        for(var comp : simulationComponents){
+            for(var edge : comp.getEdges()){
+                for(var id : ids){
                     if(edge.getId().equals(id)){
                         edge.setIsHighlighted(true);
                     }
