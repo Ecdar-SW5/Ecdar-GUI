@@ -13,9 +13,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
@@ -102,6 +100,16 @@ public class TracePaneElementController implements Initializable {
         root.getChildren().remove(traceSummary);
     }
 
+    private void previewStep(final SimulationState state) {
+        traceList.getChildren().forEach(trace -> trace.setOpacity(1));
+        int i = traceList.getChildren().size() - 1;
+        while (traceList.getChildren().get(i) != transitionPresentationMap.get(state)) {
+            traceList.getChildren().get(i).setOpacity(0.5);
+            i--;
+        }
+        Ecdar.getSimulationHandler().previewStateFromLog(state);
+    }
+
     /**
      * Instantiates a {@link TransitionPresentation} for a {@link SimulationState} and adds it to the view
      *
@@ -116,7 +124,7 @@ public class TracePaneElementController implements Initializable {
             event.consume();
             final SimulationHandler simHandler = Ecdar.getSimulationHandler();
             if (simHandler == null) return;
-            Ecdar.getSimulationHandler().selectStateFromLog(state);
+            previewStep(state);
         });
 
         EventHandler mouseEntered = transitionPresentation.getOnMouseEntered();

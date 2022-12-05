@@ -66,7 +66,6 @@ public class SimulationHandler {
         this.currentState.set(null);
         this.selectedEdge.set(null);
         this.traceLog.clear();
-        
         this.system = getSystem();
     }
 
@@ -138,6 +137,7 @@ public class SimulationHandler {
      * Take a step in the simulation.
      */
     public void nextStep() {
+        selectStateFromLog(currentState.get());
         GrpcRequest request = new GrpcRequest(backendConnection -> {
             StreamObserver<SimulationStepResponse> responseObserver = new StreamObserver<>() {
                 @Override
@@ -225,7 +225,7 @@ public class SimulationHandler {
     }
 
     /**
-     * Sets the value of simulation variables and clocks, based on {@link SimulationHandler#currentConcreteState}
+     * Sets the value of simulation variables and clocks, based on currentConcreteState
      */
     private void setSimVarAndClocks() {
         // The variables and clocks are all found in the getVariables array
@@ -344,6 +344,13 @@ public class SimulationHandler {
         while (traceLog.get(traceLog.size() - 1) != state) {
             traceLog.remove(traceLog.size() - 1);
         }
+        currentState.set(state);
+    }
+
+    /**
+     * Preview a state of the siomulation without deleting the current trace log
+     */
+    public void previewStateFromLog(SimulationState state) {
         currentState.set(state);
     }
 }
