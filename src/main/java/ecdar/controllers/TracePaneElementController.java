@@ -107,7 +107,7 @@ public class TracePaneElementController implements Initializable {
             traceList.getChildren().get(i).setOpacity(0.4);
             i--;
         }
-        Ecdar.getSimulationHandler().previewStateFromLog(state);
+        Ecdar.getSimulationHandler().currentState.set(state);
     }
 
     /**

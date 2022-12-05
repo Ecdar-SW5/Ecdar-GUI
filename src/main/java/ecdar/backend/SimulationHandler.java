@@ -137,7 +137,9 @@ public class SimulationHandler {
      * Take a step in the simulation.
      */
     public void nextStep() {
-        selectStateFromLog(currentState.get());
+        // removes invalid states from the log when stepping forward after previewing a previous state
+        removeStatesFromLog(currentState.get()); 
+        
         GrpcRequest request = new GrpcRequest(backendConnection -> {
             StreamObserver<SimulationStepResponse> responseObserver = new StreamObserver<>() {
                 @Override
@@ -336,21 +338,12 @@ public class SimulationHandler {
         }
     }
 
-
     /**
-     * Sets the current state of the simulation to the given state from the trace log
+     * Removes all states from the trace log after the given state
      */
-    public void selectStateFromLog(SimulationState state) {
+    private void removeStatesFromLog(SimulationState state) {
         while (traceLog.get(traceLog.size() - 1) != state) {
             traceLog.remove(traceLog.size() - 1);
         }
-        currentState.set(state);
-    }
-
-    /**
-     * Preview a state of the siomulation without deleting the current trace log
-     */
-    public void previewStateFromLog(SimulationState state) {
-        currentState.set(state);
     }
 }
