@@ -117,8 +117,6 @@ public class SimulationHandler {
         
         backendDriver.addRequestToExecutionQueue(request);
         
-        //Save the previous states, and get the new
-        this.traceLog.add(currentState.get());
         numberOfSteps++;
     
         //Updates the transitions available
