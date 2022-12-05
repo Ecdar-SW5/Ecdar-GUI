@@ -104,7 +104,7 @@ public class TracePaneElementController implements Initializable {
         traceList.getChildren().forEach(trace -> trace.setOpacity(1));
         int i = traceList.getChildren().size() - 1;
         while (traceList.getChildren().get(i) != transitionPresentationMap.get(state)) {
-            traceList.getChildren().get(i).setOpacity(0.5);
+            traceList.getChildren().get(i).setOpacity(0.4);
             i--;
         }
         Ecdar.getSimulationHandler().previewStateFromLog(state);
