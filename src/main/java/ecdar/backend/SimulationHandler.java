@@ -39,6 +39,7 @@ public class SimulationHandler {
     public ObjectProperty<Edge> selectedEdge = new SimpleObjectProperty<>();
     private EcdarSystem system;
     private int numberOfSteps;
+    private String simulationQuery;
 
     private final ObservableMap<String, BigDecimal> simulationVariables = FXCollections.observableHashMap();
     private final ObservableMap<String, BigDecimal> simulationClocks = FXCollections.observableHashMap();
@@ -359,5 +360,13 @@ public class SimulationHandler {
 
     public List<String> getComponentsInSimulation() {
         return ComponentsInSimulation;
+    }
+
+    public void setSimulationQuery(String query) {
+        simulationQuery = query;
+    }
+
+    public String getSimulationQuery(){
+        return simulationQuery;
     }
 }

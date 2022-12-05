@@ -24,13 +24,13 @@ public class SimulationInitializationDialogController implements Initializable {
      */
     public void setSimulationData(){
         // set simulation query
-        SimulatorController.setSimulationQuery(simulationComboBox.getSelectionModel().getSelectedItem());
+        simulationHandler.setSimulationQuery(simulationComboBox.getSelectionModel().getSelectedItem());
 
         // set list of components involved in simulation
         simulationHandler.clearComponentsInSimulation();
         // pattern filters out all components by ignoring operators.
         Pattern pattern = Pattern.compile("([\\w]*)", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(SimulatorController.getSimulationQuery());
+        Matcher matcher = pattern.matcher(simulationHandler.getSimulationQuery());
         List<String> listOfComponentsToSimulate = new ArrayList<>();
         //Adds all found components to list.
         while(matcher.find()){

@@ -6,6 +6,7 @@ import ecdar.Debug;
 import ecdar.Ecdar;
 import ecdar.abstractions.*;
 import ecdar.backend.BackendHelper;
+import ecdar.backend.SimulationHandler;
 import ecdar.code_analysis.CodeAnalysis;
 import ecdar.mutation.models.MutationTestPlan;
 import ecdar.presentations.*;
@@ -48,6 +49,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class EcdarController implements Initializable {
+    private SimulationHandler simulationHandler;
     // Reachability analysis
     public static boolean reachabilityServiceEnabled = false;
     private static long reachabilityTime = Long.MAX_VALUE;
@@ -189,6 +191,8 @@ public class EcdarController implements Initializable {
         rightSimPane.maxWidthProperty().bind(queryPane.maxWidthProperty());
 
         enterEditorMode();
+
+        simulationHandler = Ecdar.getSimulationHandler();
     }
 
     public StackPane getCenter() {
@@ -290,7 +294,7 @@ public class EcdarController implements Initializable {
         simulationInitializationDialog.getController().startButton.setOnMouseClicked(event -> {
 
             // ToDo NIELS: Start simulation of selected query
-            Ecdar.getSimulationHandler().setComposition(simulationInitializationDialog.getController().simulationComboBox.getSelectionModel().getSelectedItem());
+            simulationHandler.setComposition(simulationInitializationDialog.getController().simulationComboBox.getSelectionModel().getSelectedItem());
             currentMode.setValue(Mode.Simulator);
             simulationInitializationDialog.close();
         });
@@ -451,7 +455,7 @@ public class EcdarController implements Initializable {
                         component.getLocations().forEach(location -> location.setReachability(Location.Reachability.EXCLUDED));
                     } else {
                         component.getLocations().forEach(location -> {
-                            final String locationReachableQuery = BackendHelper.getLocationReachableQuery(location, component, SimulatorController.getSimulationQuery());
+                            final String locationReachableQuery = BackendHelper.getLocationReachableQuery(location, component, simulationHandler.getSimulationQuery());
 
                             Query reachabilityQuery = new Query(locationReachableQuery, "", QueryState.UNKNOWN);
                             reachabilityQuery.setType(QueryType.REACHABILITY);
@@ -661,7 +665,7 @@ public class EcdarController implements Initializable {
                     return;
                 }
 
-                if (!Ecdar.getSimulationHandler().isSimulationRunning()) {
+                if (!simulationHandler.isSimulationRunning()) {
                     ArrayList<String> queryOptions = Ecdar.getProject().getQueries().stream().map(Query::getQuery).collect(Collectors.toCollection(ArrayList::new));
                     if (!simulationInitializationDialog.getController().simulationComboBox.getItems().equals(queryOptions)) {
                         simulationInitializationDialog.getController().simulationComboBox.getItems().setAll(queryOptions);

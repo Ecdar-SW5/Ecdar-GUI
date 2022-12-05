@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class SimulatorController implements Initializable {
-    private static String simulationQuery;
     public StackPane root;
     private SimulationHandler simulationHandler;
     public SimulatorOverviewPresentation overviewPresentation;
@@ -134,12 +133,5 @@ public class SimulatorController implements Initializable {
 
     public static void setSelectedState(SimulationState selectedState) {
         SimulatorController.selectedState.set(selectedState);
-    }
-    public static void setSimulationQuery(String query) {
-        simulationQuery = query;
-    }
-
-    public static String getSimulationQuery(){
-        return simulationQuery;
     }
 }
