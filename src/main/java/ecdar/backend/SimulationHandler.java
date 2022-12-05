@@ -365,7 +365,13 @@ public class SimulationHandler {
      * Highlights the edges from the reachability response
      */
     public void highlightReachabilityEdges(ArrayList<String> ids){
-        //TODO unhighlight edges from previous reachability response
+        //unhighlight all edges
+        for(var comp : simulationComponents){
+            for(var edge : comp.getEdges()){
+                edge.setIsHighlighted(false);
+            }
+        }
+        //highlight the edges from the reachability response
         for(var comp : simulationComponents){
             for(var edge : comp.getEdges()){
                 for(var id : ids){
