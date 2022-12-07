@@ -396,7 +396,7 @@ public class SimulationHandler {
         //unhighlight all edges
         for(var comp : simulationComponents){
             for(var edge : comp.getEdges()){
-                edge.setIsHighlighted(false);
+                edge.setIsHighlightedForReachability(false);
             }
         }
         //highlight the edges from the reachability response
@@ -404,7 +404,7 @@ public class SimulationHandler {
             for(var edge : comp.getEdges()){
                 for(var id : ids){
                     if(edge.getId().equals(id)){
-                        edge.setIsHighlighted(true);
+                        edge.setIsHighlightedForReachability(true);
                     }
                 }
             }
