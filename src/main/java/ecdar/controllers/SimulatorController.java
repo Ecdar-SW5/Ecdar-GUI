@@ -105,7 +105,7 @@ public class SimulatorController implements Initializable {
                 }
             }
         }
-        Ecdar.getSimulationHandler().setSimulationComponents((ArrayList<Component>) SelectedComponents);
+        simulationHandler.setSimulationComponents((ArrayList<Component>) SelectedComponents);
         return SelectedComponents;
     }
 
@@ -115,7 +115,7 @@ public class SimulatorController implements Initializable {
     public void resetCurrentSimulation() {
         overviewPresentation.getController().removeProcessesFromGroup();
         resetSimulation();
-        Ecdar.getSimulationHandler().resetToInitialLocation();
+        simulationHandler.resetToInitialLocation();
         overviewPresentation.getController().addProcessesToGroup();
     }
 

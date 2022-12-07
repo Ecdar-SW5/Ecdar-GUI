@@ -38,10 +38,13 @@ public class TracePaneElementController implements Initializable {
     private SimpleBooleanProperty isTraceExpanded = new SimpleBooleanProperty(false);
     private Map<SimulationState, TransitionPresentation> transitionPresentationMap = new LinkedHashMap<>();
     private SimpleIntegerProperty numberOfSteps = new SimpleIntegerProperty(0);
+    private SimulationHandler simulationHandler;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Ecdar.getSimulationHandler().getTraceLog().addListener((ListChangeListener<SimulationState>) c -> {
+        simulationHandler = Ecdar.getSimulationHandler();
+
+        simulationHandler.getTraceLog().addListener((ListChangeListener<SimulationState>) c -> {
             while (c.next()) {
                 for (final SimulationState state : c.getAddedSubList()) {
                     if (state != null) insertTraceState(state, true);
@@ -107,7 +110,7 @@ public class TracePaneElementController implements Initializable {
             traceList.getChildren().get(i).setOpacity(0.4);
             i--;
         }
-        Ecdar.getSimulationHandler().currentState.set(state);
+        simulationHandler.currentState.set(state);
     }
 
     /**
@@ -122,8 +125,7 @@ public class TracePaneElementController implements Initializable {
 
         transitionPresentation.setOnMouseReleased(event -> {
             event.consume();
-            final SimulationHandler simHandler = Ecdar.getSimulationHandler();
-            if (simHandler == null) return;
+            if (simulationHandler == null) return;
             previewStep(state);
         });
 
