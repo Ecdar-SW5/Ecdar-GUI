@@ -66,7 +66,6 @@ public class SimulationHandler {
         this.currentState.set(null);
         this.selectedEdge.set(null);
         this.traceLog.clear();
-        
         this.system = getSystem();
     }
 
@@ -119,8 +118,6 @@ public class SimulationHandler {
         
         backendDriver.addRequestToExecutionQueue(request);
         
-        //Save the previous states, and get the new
-        this.traceLog.add(currentState.get());
         numberOfSteps++;
     
         //Updates the transitions available
@@ -139,6 +136,9 @@ public class SimulationHandler {
      * Take a step in the simulation.
      */
     public void nextStep() {
+        // removes invalid states from the log when stepping forward after previewing a previous state
+        removeStatesFromLog(currentState.get()); 
+        
         GrpcRequest request = new GrpcRequest(backendConnection -> {
             StreamObserver<SimulationStepResponse> responseObserver = new StreamObserver<>() {
                 @Override
@@ -227,7 +227,7 @@ public class SimulationHandler {
     }
 
     /**
-     * Sets the value of simulation variables and clocks, based on {@link SimulationHandler#currentConcreteState}
+     * Sets the value of simulation variables and clocks, based on currentConcreteState
      */
     private void setSimVarAndClocks() {
         // The variables and clocks are all found in the getVariables array
@@ -338,14 +338,12 @@ public class SimulationHandler {
         }
     }
 
-
     /**
-     * Sets the current state of the simulation to the given state from the trace log
+     * Removes all states from the trace log after the given state
      */
-    public void selectStateFromLog(SimulationState state) {
+    private void removeStatesFromLog(SimulationState state) {
         while (traceLog.get(traceLog.size() - 1) != state) {
             traceLog.remove(traceLog.size() - 1);
         }
-        currentState.set(state);
     }
 }
