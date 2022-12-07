@@ -155,7 +155,7 @@ public class EcdarController implements Initializable {
     /**
      * Enumeration to keep track of which mode the application is in
      */
-    private enum Mode {
+    public enum Mode {
         Editor, Simulator
     }
 
@@ -163,7 +163,7 @@ public class EcdarController implements Initializable {
      * currentMode is a property that keeps track of which mode the application is in.
      * The initial mode is Mode.Editor
      */
-    private static final ObjectProperty<Mode> currentMode = new SimpleObjectProperty<>(Mode.Editor);
+    public static final ObjectProperty<Mode> currentMode = new SimpleObjectProperty<>(Mode.Editor);
 
     private static final EditorPresentation editorPresentation = new EditorPresentation();
     public final ProjectPanePresentation projectPane = new ProjectPanePresentation();
@@ -709,7 +709,7 @@ public class EcdarController implements Initializable {
                     break;
                 }
             }
-            scaling.selectToggle(scaleM); // Necessary to avoid project pane appearing off-screen
+            // scaling.selectToggle(scaleM); // Necessary to avoid project pane appearing off-screen
             scaling.selectToggle((RadioMenuItem) matchingToggle);
         });
 
@@ -1004,7 +1004,6 @@ public class EcdarController implements Initializable {
         leftPane.getChildren().add(projectPane);
         rightPane.getChildren().clear();
         rightPane.getChildren().add(queryPane);
-        scaling.selectToggle(scaleM); // temporary fix for scaling issue
 
         // Enable or disable the menu items that can be used when in the simulator
 //        updateMenuItems();
