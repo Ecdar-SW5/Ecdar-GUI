@@ -167,13 +167,21 @@ public class TracePaneElementController implements Initializable {
             String locationName = loc.getId();
             if (i == length - 1) {
                 title.append(locationName);
-            } else {
+            } else  {
                 title.append(locationName).append(", ");
             }
         }
-        title.append(")");
+        title.append(")\n");
 
-        return title.toString();
+        StringBuilder clocks = new StringBuilder();
+        for (var constraint : state.getState().getFederation().getDisjunction().getConjunctions(0).getConstraintsList()) {
+            var x = constraint.getX().getClockName();
+            var y = constraint.getY().getClockName();
+            var c = constraint.getC();
+            var strict = constraint.getStrict();
+            clocks.append(x).append(" - ").append(y).append(strict ? " < " : " <= ").append(c).append("\n");
+        }
+        return title.toString() + clocks.toString();
     }
 
     /**
