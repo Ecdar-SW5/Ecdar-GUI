@@ -300,6 +300,10 @@ public class SimulationHandler {
         return simulationClocks;
     }
 
+    public SimulationState getCurrentState() {
+        return currentState.get();
+    }
+
     /**
      * The initial state of the current simulation
      *
