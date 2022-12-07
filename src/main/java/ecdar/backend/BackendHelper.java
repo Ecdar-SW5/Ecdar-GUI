@@ -104,7 +104,7 @@ public final class BackendHelper {
         var locations = state.getLocations();
         stringBuilder.append("[");
         var appendLocationWithSeparator = false;
-        for(var componentName:ListOfComponents){
+        for(var componentName:Ecdar.getSimulationHandler().getComponentsInSimulation()){
             var locationFound = false;
 
             for(var location:locations){
