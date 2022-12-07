@@ -103,12 +103,12 @@ public class SimLocationController implements Initializable {
             dropDownMenu.hide();
         });
 
-        dropDownMenu.addClickableListElement("Is " + getLocation().getId() + " reachable from current state?", event -> {
+        dropDownMenu.addClickableListElement("Is " + getLocation().getId() + " reachable from current locations?", event -> {
             // Generate the query from the backend
             final String reachabilityQuery = BackendHelper.getLocationReachableQuery(getLocation(), getComponent(), simulationHandler.getSimulationQuery(), Ecdar.getSimulationHandler().getCurrentState());
 
             // Add proper comment
-            final String reachabilityComment = "Is " + getLocation().getMostDescriptiveIdentifier() + " reachable from current state?";
+            final String reachabilityComment = "Is " + getLocation().getMostDescriptiveIdentifier() + " reachable from current locations?";
 
             // Add new query for this location
             final Query query = new Query(reachabilityQuery, reachabilityComment, QueryState.UNKNOWN);
