@@ -86,12 +86,29 @@ public class SimLocationController implements Initializable {
     public void initializeDropDownMenu(){
         dropDownMenu = new DropDownMenu(root);
 
-        dropDownMenu.addClickableListElement("Is " + getLocation().getId() + " reachable?", event -> {
+        dropDownMenu.addClickableListElement("Is " + getLocation().getId() + " reachable from initial state?", event -> {
             // Generate the query from the backend
             final String reachabilityQuery = BackendHelper.getLocationReachableQuery(getLocation(), getComponent(), simulationHandler.getSimulationQuery());
 
             // Add proper comment
-            final String reachabilityComment = "Is " + getLocation().getMostDescriptiveIdentifier() + " reachable?";
+            final String reachabilityComment = "Is " + getLocation().getMostDescriptiveIdentifier() + " reachable from initial state?";
+
+            // Add new query for this location
+            final Query query = new Query(reachabilityQuery, reachabilityComment, QueryState.UNKNOWN);
+            query.setType(QueryType.REACHABILITY);
+
+            // execute query
+            Ecdar.getQueryExecutor().executeQuery(query);
+
+            dropDownMenu.hide();
+        });
+
+        dropDownMenu.addClickableListElement("Is " + getLocation().getId() + " reachable from current state?", event -> {
+            // Generate the query from the backend
+            final String reachabilityQuery = BackendHelper.getLocationReachableQuery(getLocation(), getComponent(), SimulatorController.getSimulationQuery(), Ecdar.getSimulationHandler().getCurrentState());
+
+            // Add proper comment
+            final String reachabilityComment = "Is " + getLocation().getMostDescriptiveIdentifier() + " reachable from current state?";
 
             // Add new query for this location
             final Query query = new Query(reachabilityQuery, reachabilityComment, QueryState.UNKNOWN);

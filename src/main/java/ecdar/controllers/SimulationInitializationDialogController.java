@@ -19,8 +19,8 @@ public class SimulationInitializationDialogController implements Initializable {
     private SimulationHandler simulationHandler;
 
     /**
-     * Function gets list of components to simulation
-     * and saves it in the public static ListOfComponents
+     * Function extracts data from simulation initialization (query and list of components to simulation)
+     * and saves it
      */
     public void setSimulationData(){
         // set simulation query

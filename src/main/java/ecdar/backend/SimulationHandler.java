@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import EcdarProtoBuf.QueryProtos.SimulationInfo;
 import EcdarProtoBuf.QueryProtos.SimulationStepRequest;
 import EcdarProtoBuf.QueryProtos.SimulationStepResponse;
+import org.checkerframework.checker.units.qual.A;
 
 /**
  * Handles state changes, updates of values / clocks, and keeps track of all the transitions that
@@ -40,7 +41,7 @@ public class SimulationHandler {
     private EcdarSystem system;
     private int numberOfSteps;
     private String simulationQuery;
-
+    private ArrayList<Component> simulationComponents = new ArrayList<>();
     private final ObservableMap<String, BigDecimal> simulationVariables = FXCollections.observableHashMap();
     private final ObservableMap<String, BigDecimal> simulationClocks = FXCollections.observableHashMap();
     public ObservableList<SimulationState> traceLog = FXCollections.observableArrayList();
@@ -73,7 +74,6 @@ public class SimulationHandler {
         this.currentState.set(null);
         this.selectedEdge.set(null);
         this.traceLog.clear();
-        
         this.system = getSystem();
     }
 
@@ -88,7 +88,8 @@ public class SimulationHandler {
             StreamObserver<SimulationStepResponse> responseObserver = new StreamObserver<>() {
                 @Override
                 public void onNext(QueryProtos.SimulationStepResponse value) {
-                    currentState.set(new SimulationState(value.getNewDecisionPoint()));
+                    // TODO this is temp solution to compile but should be fixed to handle ambiguity
+                    currentState.set(new SimulationState(value.getNewDecisionPoints(0)));
                     Platform.runLater(() -> traceLog.add(currentState.get()));
                 }
                 
@@ -125,8 +126,6 @@ public class SimulationHandler {
         
         backendDriver.addRequestToExecutionQueue(request);
         
-        //Save the previous states, and get the new
-        this.traceLog.add(currentState.get());
         numberOfSteps++;
     
         //Updates the transitions available
@@ -145,11 +144,15 @@ public class SimulationHandler {
      * Take a step in the simulation.
      */
     public void nextStep() {
+        // removes invalid states from the log when stepping forward after previewing a previous state
+        removeStatesFromLog(currentState.get()); 
+        
         GrpcRequest request = new GrpcRequest(backendConnection -> {
             StreamObserver<SimulationStepResponse> responseObserver = new StreamObserver<>() {
                 @Override
                 public void onNext(QueryProtos.SimulationStepResponse value) {
-                    currentState.set(new SimulationState(value.getNewDecisionPoint()));
+                    // TODO this is temp solution to compile but should be fixed to handle ambiguity
+                    currentState.set(new SimulationState(value.getNewDecisionPoints(0)));
                     Platform.runLater(() -> traceLog.add(currentState.get()));
                 }
                 
@@ -232,7 +235,7 @@ public class SimulationHandler {
     }
 
     /**
-     * Sets the value of simulation variables and clocks, based on {@link SimulationHandler#currentConcreteState}
+     * Sets the value of simulation variables and clocks, based on currentConcreteState
      */
     private void setSimVarAndClocks() {
         // The variables and clocks are all found in the getVariables array
@@ -305,6 +308,10 @@ public class SimulationHandler {
         return simulationClocks;
     }
 
+    public SimulationState getCurrentState() {
+        return currentState.get();
+    }
+
     /**
      * The initial state of the current simulation
      *
@@ -343,15 +350,13 @@ public class SimulationHandler {
         }
     }
 
-
     /**
-     * Sets the current state of the simulation to the given state from the trace log
+     * Removes all states from the trace log after the given state
      */
-    public void selectStateFromLog(SimulationState state) {
+    private void removeStatesFromLog(SimulationState state) {
         while (traceLog.get(traceLog.size() - 1) != state) {
             traceLog.remove(traceLog.size() - 1);
         }
-        currentState.set(state);
     }
 
     public void setComponentsInSimulation(List<String> value) {
@@ -368,5 +373,41 @@ public class SimulationHandler {
 
     public String getSimulationQuery(){
         return simulationQuery;
+    }
+
+    /**
+     * Set list of components used in the simulation
+     */
+    public void setSimulationComponents(ArrayList<Component> components){
+        simulationComponents = components;
+    }
+
+    /**
+     * Get list of components used in the simulation
+     */
+    public ArrayList<Component> getSimulationComponents(){
+        return simulationComponents;
+    }
+
+    /**
+     * Highlights the edges from the reachability response
+     */
+    public void highlightReachabilityEdges(ArrayList<String> ids){
+        //unhighlight all edges
+        for(var comp : simulationComponents){
+            for(var edge : comp.getEdges()){
+                edge.setIsHighlighted(false);
+            }
+        }
+        //highlight the edges from the reachability response
+        for(var comp : simulationComponents){
+            for(var edge : comp.getEdges()){
+                for(var id : ids){
+                    if(edge.getId().equals(id)){
+                        edge.setIsHighlighted(true);
+                    }
+                }
+            }
+        }
     }
 }
