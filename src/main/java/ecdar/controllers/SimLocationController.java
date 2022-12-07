@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXPopup;
 import ecdar.Ecdar;
 import ecdar.abstractions.*;
 import ecdar.backend.BackendHelper;
+import ecdar.backend.SimulationHandler;
 import ecdar.presentations.DropDownMenu;
 import ecdar.presentations.SimLocationPresentation;
 import ecdar.presentations.SimTagPresentation;
@@ -43,6 +44,7 @@ public class SimLocationController implements Initializable {
     public Line nameTagLine;
     public Line invariantTagLine;
     private DropDownMenu dropDownMenu;
+    private SimulationHandler simulationHandler;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
@@ -57,6 +59,8 @@ public class SimLocationController implements Initializable {
         // Scale x and y 1:1 (based on the x-scale)
         scaleContent.scaleYProperty().bind(scaleContent.scaleXProperty());
         initializeMouseControls();
+
+        simulationHandler = Ecdar.getSimulationHandler();
     }
 
     private void initializeMouseControls() {
@@ -84,7 +88,7 @@ public class SimLocationController implements Initializable {
 
         dropDownMenu.addClickableListElement("Is " + getLocation().getId() + " reachable from initial state?", event -> {
             // Generate the query from the backend
-            final String reachabilityQuery = BackendHelper.getLocationReachableQuery(getLocation(), getComponent(), SimulatorController.getSimulationQuery());
+            final String reachabilityQuery = BackendHelper.getLocationReachableQuery(getLocation(), getComponent(), simulationHandler.getSimulationQuery());
 
             // Add proper comment
             final String reachabilityComment = "Is " + getLocation().getMostDescriptiveIdentifier() + " reachable from initial state?";

@@ -19,6 +19,7 @@ import javafx.util.Pair;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -39,6 +40,7 @@ public class SimulationHandler {
     public ObjectProperty<Edge> selectedEdge = new SimpleObjectProperty<>();
     private EcdarSystem system;
     private int numberOfSteps;
+    private String simulationQuery;
     private ArrayList<Component> simulationComponents = new ArrayList<>();
     private final ObservableMap<String, BigDecimal> simulationVariables = FXCollections.observableHashMap();
     private final ObservableMap<String, BigDecimal> simulationClocks = FXCollections.observableHashMap();
@@ -46,11 +48,17 @@ public class SimulationHandler {
     private final BackendDriver backendDriver;
     private final ArrayList<BackendConnection> connections = new ArrayList<>();
 
+    private List<String> ComponentsInSimulation = new ArrayList<>();
+
     /**
      * Empty constructor that should be used if the system or project has not be initialized yet
      */
     public SimulationHandler(BackendDriver backendDriver) {
         this.backendDriver = backendDriver;
+    }
+
+    public void clearComponentsInSimulation() {
+        ComponentsInSimulation.clear();
     }
 
     /**
@@ -351,6 +359,22 @@ public class SimulationHandler {
         }
     }
 
+    public void setComponentsInSimulation(List<String> value) {
+        ComponentsInSimulation = value;
+    }
+
+    public List<String> getComponentsInSimulation() {
+        return ComponentsInSimulation;
+    }
+
+    public void setSimulationQuery(String query) {
+        simulationQuery = query;
+    }
+
+    public String getSimulationQuery(){
+        return simulationQuery;
+    }
+
     /**
      * Set list of components used in the simulation
      */
@@ -386,5 +410,4 @@ public class SimulationHandler {
             }
         }
     }
-
 }

@@ -20,8 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static ecdar.controllers.SimulationInitializationDialogController.ListOfComponents;
-
 public final class BackendHelper {
     final static String TEMP_DIRECTORY = "temporary";
     private static BackendInstance defaultBackend = null;
@@ -141,7 +139,7 @@ public final class BackendHelper {
         stringBuilder.append("[");
         var appendLocationWithSeparator = false;
 
-        for (var component:ListOfComponents)
+        for (var component:Ecdar.getSimulationHandler().getComponentsInSimulation())
         {
             if (component.equals(componentName)){
                 if (appendLocationWithSeparator){
