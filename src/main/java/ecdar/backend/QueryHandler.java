@@ -146,7 +146,7 @@ public class QueryHandler {
 
                 }
                 break;
-
+            
             case IMPLEMENTATION:
                 if (value.getImplementation().getSuccess()) {
                     query.setQueryState(QueryState.SUCCESSFUL);
@@ -161,44 +161,54 @@ public class QueryHandler {
                 }
                 break;
 
-                case REACHABILITY:
-                    if (value.getReachability().getSuccess()) {
-                        query.setQueryState(QueryState.SUCCESSFUL);
-                        if(value.getReachability().getSuccess()){
-                            Ecdar.showToast("Reachability check was successful and the location can be reached.");
-                        }
-                        else if(!value.getReachability().getSuccess()){
-                            Ecdar.showToast("Reachability check was successful but the location cannot be reached.");
-                        }
-                        query.getSuccessConsumer().accept(true);
-                    } else {
-                        query.setQueryState(QueryState.ERROR);
-                        Ecdar.showToast("Error from backend: Reachability check was unsuccessful!");
-                        query.getFailureConsumer().accept(new BackendException.QueryErrorException(value.getReachability().getReason()));
-                        query.getSuccessConsumer().accept(false);
-                        //ToDo: These errors are not implemented in the Reveaal backend.
-                        query.getStateActionConsumer().accept(value.getReachability().getState(),
-                                new ArrayList<>());
-                    }
-                    break;
+          case REACHABILITY:
+              if (value.getReachability().getSuccess()) {
+                  query.setQueryState(QueryState.SUCCESSFUL);
+                  if(value.getReachability().getSuccess()){
+                      Ecdar.showToast("Reachability check was successful and the location can be reached.");
 
-                case COMPONENT:
-                    query.setQueryState(QueryState.SUCCESSFUL);
-                    query.getSuccessConsumer().accept(true);
-                    JsonObject returnedComponent = (JsonObject) JsonParser.parseString(value.getComponent().getComponent().getJson());
-                    addGeneratedComponent(new Component(returnedComponent));
-                    break;
+                      //create list of edge id's
+                      ArrayList<String> edgeIds = new ArrayList<>();
+                      for(var pathsList : value.getReachability().getComponentPathsList()){
+                          for(var id : pathsList.getEdgeIdsList().toArray()) {
+                              edgeIds.add(id.toString());
+                          }
+                      }
+                      //highlight the edges
+                      Ecdar.getSimulationHandler().highlightReachabilityEdges(edgeIds);
+                  }
+                  else if(!value.getReachability().getSuccess()){
+                      Ecdar.showToast("Reachability check was successful but the location cannot be reached.");
+                  }
+                  query.getSuccessConsumer().accept(true);
+              } else {
+                  query.setQueryState(QueryState.ERROR);
+                  Ecdar.showToast("Error from backend: Reachability check was unsuccessful!");
+                  query.getFailureConsumer().accept(new BackendException.QueryErrorException(value.getReachability().getReason()));
+                  query.getSuccessConsumer().accept(false);
+                  //ToDo: These errors are not implemented in the Reveaal backend.
+                  query.getStateActionConsumer().accept(value.getReachability().getState(),
+                          new ArrayList<>());
+              }
+              break;
 
-            case ERROR:
-                query.setQueryState(QueryState.ERROR);
-                query.getFailureConsumer().accept(new BackendException.QueryErrorException(value.getError()));
-                query.getSuccessConsumer().accept(false);
-                break;
+          case COMPONENT:
+              query.setQueryState(QueryState.SUCCESSFUL);
+              query.getSuccessConsumer().accept(true);
+              JsonObject returnedComponent = (JsonObject) JsonParser.parseString(value.getComponent().getComponent().getJson());
+              addGeneratedComponent(new Component(returnedComponent));
+              break;
 
-            case RESULT_NOT_SET:
-                query.setQueryState(QueryState.ERROR);
-                query.getSuccessConsumer().accept(false);
-                break;
+          case ERROR:
+              query.setQueryState(QueryState.ERROR);
+              query.getFailureConsumer().accept(new BackendException.QueryErrorException(value.getError()));
+              query.getSuccessConsumer().accept(false);
+              break;
+
+          case RESULT_NOT_SET:
+              query.setQueryState(QueryState.ERROR);
+              query.getSuccessConsumer().accept(false);
+              break;
         }
 
     }

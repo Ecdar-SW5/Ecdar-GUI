@@ -105,6 +105,7 @@ public class SimulatorController implements Initializable {
                 }
             }
         }
+        Ecdar.getSimulationHandler().setSimulationComponents((ArrayList<Component>) SelectedComponents);
         return SelectedComponents;
     }
 

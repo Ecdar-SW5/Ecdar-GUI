@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import EcdarProtoBuf.QueryProtos.SimulationInfo;
 import EcdarProtoBuf.QueryProtos.SimulationStepRequest;
 import EcdarProtoBuf.QueryProtos.SimulationStepResponse;
+import org.checkerframework.checker.units.qual.A;
 
 /**
  * Handles state changes, updates of values / clocks, and keeps track of all the transitions that
@@ -38,7 +39,7 @@ public class SimulationHandler {
     public ObjectProperty<Edge> selectedEdge = new SimpleObjectProperty<>();
     private EcdarSystem system;
     private int numberOfSteps;
-
+    private ArrayList<Component> simulationComponents = new ArrayList<>();
     private final ObservableMap<String, BigDecimal> simulationVariables = FXCollections.observableHashMap();
     private final ObservableMap<String, BigDecimal> simulationClocks = FXCollections.observableHashMap();
     public ObservableList<SimulationState> traceLog = FXCollections.observableArrayList();
@@ -51,7 +52,6 @@ public class SimulationHandler {
     public SimulationHandler(BackendDriver backendDriver) {
         this.backendDriver = backendDriver;
     }
-
 
     /**
      * Initializes the values and properties in the {@link SimulationHandler}.
@@ -350,4 +350,41 @@ public class SimulationHandler {
             traceLog.remove(traceLog.size() - 1);
         }
     }
+
+    /**
+     * Set list of components used in the simulation
+     */
+    public void setSimulationComponents(ArrayList<Component> components){
+        simulationComponents = components;
+    }
+
+    /**
+     * Get list of components used in the simulation
+     */
+    public ArrayList<Component> getSimulationComponents(){
+        return simulationComponents;
+    }
+
+    /**
+     * Highlights the edges from the reachability response
+     */
+    public void highlightReachabilityEdges(ArrayList<String> ids){
+        //unhighlight all edges
+        for(var comp : simulationComponents){
+            for(var edge : comp.getEdges()){
+                edge.setIsHighlighted(false);
+            }
+        }
+        //highlight the edges from the reachability response
+        for(var comp : simulationComponents){
+            for(var edge : comp.getEdges()){
+                for(var id : ids){
+                    if(edge.getId().equals(id)){
+                        edge.setIsHighlighted(true);
+                    }
+                }
+            }
+        }
+    }
+
 }
