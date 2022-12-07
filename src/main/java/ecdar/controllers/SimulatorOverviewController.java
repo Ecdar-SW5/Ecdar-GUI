@@ -33,7 +33,7 @@ public class SimulatorOverviewController implements Initializable {
     public ScrollPane scrollPane;
     public FlowPane processContainer;
     public Group groupContainer;
-
+    private SimulationHandler simulationHandler;
     /**
      * The amount that is going be zoomed in/out for each press on + or -
      */
@@ -63,10 +63,10 @@ public class SimulatorOverviewController implements Initializable {
     private boolean resetZoom = false;
     private boolean isMaxZoomInReached = false;
     private boolean isMaxZoomOutReached = false;
-    private SimulationHandler simulationHandler;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
+        simulationHandler = Ecdar.getSimulationHandler();
         groupContainer = new Group();
         processContainer = new FlowPane();
         //In case that the processContainer gets moved around we have to keep in into place.
@@ -79,8 +79,6 @@ public class SimulatorOverviewController implements Initializable {
         // Add the processes and group to the view
         addProcessesToGroup();
         scrollPane.setContent(groupContainer);
-
-        simulationHandler = Ecdar.getSimulationHandler();
     }
 
     /**
