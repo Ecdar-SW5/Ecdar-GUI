@@ -5,7 +5,6 @@ import ecdar.abstractions.*;
 import ecdar.backend.SimulationHandler;
 import ecdar.presentations.SimulatorOverviewPresentation;
 import ecdar.simulation.SimulationState;
-import ecdar.utility.colors.Color;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;

@@ -66,7 +66,6 @@ public class SimulationHandler {
         this.currentState.set(null);
         this.selectedEdge.set(null);
         this.traceLog.clear();
-        
         this.system = getSystem();
     }
 
@@ -81,7 +80,8 @@ public class SimulationHandler {
             StreamObserver<SimulationStepResponse> responseObserver = new StreamObserver<>() {
                 @Override
                 public void onNext(QueryProtos.SimulationStepResponse value) {
-                    currentState.set(new SimulationState(value.getNewDecisionPoint()));
+                    // TODO this is temp solution to compile but should be fixed to handle ambiguity
+                    currentState.set(new SimulationState(value.getNewDecisionPoints(0)));
                     Platform.runLater(() -> traceLog.add(currentState.get()));
                 }
                 
@@ -118,8 +118,6 @@ public class SimulationHandler {
         
         backendDriver.addRequestToExecutionQueue(request);
         
-        //Save the previous states, and get the new
-        this.traceLog.add(currentState.get());
         numberOfSteps++;
     
         //Updates the transitions available
@@ -138,11 +136,15 @@ public class SimulationHandler {
      * Take a step in the simulation.
      */
     public void nextStep() {
+        // removes invalid states from the log when stepping forward after previewing a previous state
+        removeStatesFromLog(currentState.get()); 
+        
         GrpcRequest request = new GrpcRequest(backendConnection -> {
             StreamObserver<SimulationStepResponse> responseObserver = new StreamObserver<>() {
                 @Override
                 public void onNext(QueryProtos.SimulationStepResponse value) {
-                    currentState.set(new SimulationState(value.getNewDecisionPoint()));
+                    // TODO this is temp solution to compile but should be fixed to handle ambiguity
+                    currentState.set(new SimulationState(value.getNewDecisionPoints(0)));
                     Platform.runLater(() -> traceLog.add(currentState.get()));
                 }
                 
@@ -298,6 +300,10 @@ public class SimulationHandler {
         return simulationClocks;
     }
 
+    public SimulationState getCurrentState() {
+        return currentState.get();
+    }
+
     /**
      * The initial state of the current simulation
      *
@@ -336,15 +342,13 @@ public class SimulationHandler {
         }
     }
 
-
     /**
-     * Sets the current state of the simulation to the given state from the trace log
+     * Removes all states from the trace log after the given state
      */
-    public void selectStateFromLog(SimulationState state) {
+    private void removeStatesFromLog(SimulationState state) {
         while (traceLog.get(traceLog.size() - 1) != state) {
             traceLog.remove(traceLog.size() - 1);
         }
-        currentState.set(state);
     }
 
     /**
