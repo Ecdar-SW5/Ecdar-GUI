@@ -358,8 +358,7 @@ public class SimulatorOverviewController implements Initializable {
     public void highlightProcessState(final SimulationState state) {
         if (state == null) return;
 
-        for(var location : state.getLocations()){
-            final Pair<String, String> loc = location;
+        for(var loc : state.getLocations()){
 
             processPresentations.values().stream()
                     .filter(p -> p.getController().getComponent().getName().equals(loc.getKey()))
