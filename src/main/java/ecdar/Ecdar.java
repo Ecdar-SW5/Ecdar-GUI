@@ -138,6 +138,10 @@ public class Ecdar extends Application {
 
     public static SimulationHandler getSimulationHandler() { return simulationHandler; }
 
+    public static void setSimulationHandler(SimulationHandler simHandler) {
+        simulationHandler = simHandler;
+    }
+
     public static EcdarPresentation getPresentation() {
         return presentation;
     }

@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXRippler;
 import com.jfoenix.controls.JFXTextField;
 import ecdar.Ecdar;
 import ecdar.abstractions.Edge;
+import ecdar.backend.SimulationHandler;
 import ecdar.simulation.Transition;
 import ecdar.presentations.TransitionPresentation;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -40,11 +41,13 @@ public class TransitionPaneElementController implements Initializable {
     private SimpleBooleanProperty isTransitionExpanded = new SimpleBooleanProperty(false);
     private Map<Transition, TransitionPresentation> transitionPresentationMap = new HashMap<>();
     private SimpleObjectProperty<BigDecimal> delay = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private SimulationHandler simulationHandler;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeTransitionExpand();
         initializeDelayChooser();
+        simulationHandler = Ecdar.getSimulationHandler();
     }
 
     /**
@@ -175,7 +178,7 @@ public class TransitionPaneElementController implements Initializable {
      */
     @FXML
     private void restartSimulation() {
-        Ecdar.getSimulationHandler().resetToInitialLocation();
+        simulationHandler.resetToInitialLocation();
     }
 
     /**
