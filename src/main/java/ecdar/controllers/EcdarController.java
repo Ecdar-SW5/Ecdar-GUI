@@ -50,11 +50,6 @@ import java.util.stream.Collectors;
 
 public class EcdarController implements Initializable {
     private SimulationHandler simulationHandler;
-    // Reachability analysis
-    public static boolean reachabilityServiceEnabled = false;
-    private static long reachabilityTime = Long.MAX_VALUE;
-    private static ExecutorService reachabilityService;
-
     // View stuff
     public StackPane root;
     public BorderPane borderPane;
@@ -146,12 +141,6 @@ public class EcdarController implements Initializable {
     private static Text _queryTextQuery;
     private static final Text temporaryComponentWatermark = new Text("Temporary component");
 
-    public static void runReachabilityAnalysis() {
-        if (!reachabilityServiceEnabled) return;
-
-        reachabilityTime = System.currentTimeMillis() + 500;
-    }
-
     /**
      * Enumeration to keep track of which mode the application is in
      */
@@ -179,7 +168,6 @@ public class EcdarController implements Initializable {
         initializeKeybindings();
         initializeStatusBar();
         initializeMenuBar();
-        startBackgroundQueriesThread(); // Will terminate immediately if background queries are turned off
 
         // Update file coloring when active model changes
         editorPresentation.getController().getActiveCanvasPresentation().getController().activeComponentProperty().addListener(observable -> projectPane.getController().updateColorsOnFilePresentations());
@@ -408,74 +396,6 @@ public class EcdarController implements Initializable {
         KeyboardTracker.registerKeybind(KeyboardTracker.NUDGE_D, new Keybind(new KeyCodeCombination(KeyCode.D), () -> nudgeSelected(NudgeDirection.RIGHT)));
     }
 
-    private void startBackgroundQueriesThread() {
-        new Thread(() -> {
-            while (Ecdar.shouldRunBackgroundQueries.get()) {
-                // Wait for the reachability (the last time we changed the model) becomes smaller than the current time
-                while (reachabilityTime > System.currentTimeMillis()) {
-                    try {
-                        Thread.sleep(2000);
-                        Debug.backgroundThreads.removeIf(thread -> !thread.isAlive());
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                // We are now performing the analysis. Do not do another analysis before another change is introduced
-                reachabilityTime = Long.MAX_VALUE;
-
-                // Cancel any ongoing analysis
-                if (reachabilityService != null) {
-                    reachabilityService.shutdownNow();
-                }
-
-                // Start new analysis
-                reachabilityService = Executors.newFixedThreadPool(10);
-
-                while (Debug.backgroundThreads.size() > 0) {
-                    final Thread thread = Debug.backgroundThreads.get(0);
-                    thread.interrupt();
-                    Debug.removeThread(thread);
-                }
-
-                // Stop thread if background queries have been toggled off
-                if (!Ecdar.shouldRunBackgroundQueries.get()) return;
-
-                Ecdar.getProject().getQueries().forEach(query -> {
-                    if (query.isPeriodic()) Ecdar.getQueryExecutor().executeQuery(query);
-                });
-
-                // List of threads to start
-                List<Thread> threads = new ArrayList<>();
-
-                // Submit all background reachability queries
-                Ecdar.getProject().getComponents().forEach(component -> {
-                    // Check if we should consider this component
-                    if (!component.isIncludeInPeriodicCheck()) {
-                        component.getLocations().forEach(location -> location.setReachability(Location.Reachability.EXCLUDED));
-                    } else {
-                        component.getLocations().forEach(location -> {
-                            final String locationReachableQuery = BackendHelper.getLocationReachableQuery(location, component, simulationHandler.getSimulationQuery());
-
-                            Query reachabilityQuery = new Query(locationReachableQuery, "", QueryState.UNKNOWN);
-                            reachabilityQuery.setType(QueryType.REACHABILITY);
-
-                            Ecdar.getQueryExecutor().executeQuery(reachabilityQuery);
-
-                            final Thread verifyThread = new Thread(() -> Ecdar.getQueryExecutor().executeQuery(reachabilityQuery));
-
-                            verifyThread.setName(locationReachableQuery + " (" + verifyThread.getName() + ")");
-                            Debug.addThread(verifyThread);
-                            threads.add(verifyThread);
-                        });
-                    }
-                });
-
-                threads.forEach((verifyThread) -> reachabilityService.submit(verifyThread::start));
-            }
-        }).start();
-    }
-
     private void initializeStatusBar() {
         statusBar.setBackground(new Background(new BackgroundFill(
                 Color.GREY_BLUE.getColor(Color.Intensity.I800),
@@ -564,10 +484,6 @@ public class EcdarController implements Initializable {
         menuBarOptionsBackgroundQueries.setOnAction(event -> {
             final BooleanProperty shouldRunBackgroundQueries = Ecdar.toggleRunBackgroundQueries();
             Ecdar.preferences.putBoolean("run_background_queries", shouldRunBackgroundQueries.get());
-            if (shouldRunBackgroundQueries.get()) {
-                // If background queries have been turned back on, start a new thread
-                startBackgroundQueriesThread();
-            }
         });
 
         Ecdar.shouldRunBackgroundQueries.setValue(Ecdar.preferences.getBoolean("run_background_queries", true));
