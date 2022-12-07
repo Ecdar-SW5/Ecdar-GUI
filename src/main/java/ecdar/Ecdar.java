@@ -274,8 +274,6 @@ public class Ecdar extends Application {
         // Set active model
         Platform.runLater(() -> EcdarController.setActiveModelForActiveCanvas(Ecdar.getProject().getComponents().get(0)));
 
-        EcdarController.reachabilityServiceEnabled = true;
-
         // Register a key-bind for showing debug-information
         KeyboardTracker.registerKeybind("DEBUG", new Keybind(new KeyCodeCombination(KeyCode.F12), () -> {
             // Toggle the debug mode for the debug class (will update misc. debug variables which presentations bind to)
