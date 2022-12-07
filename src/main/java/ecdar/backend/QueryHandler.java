@@ -164,22 +164,21 @@ public class QueryHandler {
           case REACHABILITY:
               if (value.getReachability().getSuccess()) {
                   query.setQueryState(QueryState.SUCCESSFUL);
-                  if(value.getReachability().getSuccess()){
-                      Ecdar.showToast("Reachability check was successful and the location can be reached.");
+                  Ecdar.showToast("Reachability check was successful and the location can be reached.");
 
-                      //create list of edge id's
-                      ArrayList<String> edgeIds = new ArrayList<>();
-                      for(var pathsList : value.getReachability().getComponentPathsList()){
-                          for(var id : pathsList.getEdgeIdsList().toArray()) {
-                              edgeIds.add(id.toString());
-                          }
+                  //create list of edge id's
+                  ArrayList<String> edgeIds = new ArrayList<>();
+                  for(var pathsList : value.getReachability().getComponentPathsList()){
+                      for(var id : pathsList.getEdgeIdsList().toArray()) {
+                          edgeIds.add(id.toString());
                       }
-                      //highlight the edges
-                      Ecdar.getSimulationHandler().highlightReachabilityEdges(edgeIds);
                   }
-                  else if(!value.getReachability().getSuccess()){
-                      Ecdar.showToast("Reachability check was successful but the location cannot be reached.");
-                  }
+                  //highlight the edges
+                  Ecdar.getSimulationHandler().highlightReachabilityEdges(edgeIds);
+                  query.getSuccessConsumer().accept(true);
+              }
+              else if(!value.getReachability().getSuccess()){
+                  Ecdar.showToast("Reachability check was successful but the location cannot be reached.");
                   query.getSuccessConsumer().accept(true);
               } else {
                   query.setQueryState(QueryState.ERROR);
@@ -201,6 +200,7 @@ public class QueryHandler {
 
           case ERROR:
               query.setQueryState(QueryState.ERROR);
+              Ecdar.showToast(value.getError());
               query.getFailureConsumer().accept(new BackendException.QueryErrorException(value.getError()));
               query.getSuccessConsumer().accept(false);
               break;

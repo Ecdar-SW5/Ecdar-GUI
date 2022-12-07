@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 import EcdarProtoBuf.QueryProtos.SimulationInfo;
 import EcdarProtoBuf.QueryProtos.SimulationStepRequest;
 import EcdarProtoBuf.QueryProtos.SimulationStepResponse;
-import org.checkerframework.checker.units.qual.A;
 
 /**
  * Handles state changes, updates of values / clocks, and keeps track of all the transitions that
@@ -285,7 +284,7 @@ public class SimulationHandler {
      * @return an {@link ObservableList} of all the currently available transitions in this state
      */
     public ArrayList<Pair<String, String>> getAvailableTransitions() {
-        return currentState.get().getEdges();
+        return currentState.get().getEnabledEdges();
     }
 
     /**
@@ -396,7 +395,7 @@ public class SimulationHandler {
         //unhighlight all edges
         for(var comp : simulationComponents){
             for(var edge : comp.getEdges()){
-                edge.setIsHighlighted(false);
+                edge.setIsHighlightedForReachability(false);
             }
         }
         //highlight the edges from the reachability response
@@ -404,7 +403,7 @@ public class SimulationHandler {
             for(var edge : comp.getEdges()){
                 for(var id : ids){
                     if(edge.getId().equals(id)){
-                        edge.setIsHighlighted(true);
+                        edge.setIsHighlightedForReachability(true);
                     }
                 }
             }

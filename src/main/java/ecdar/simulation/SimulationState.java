@@ -43,7 +43,7 @@ public class SimulationState {
         return locations;
     }
 
-    public ArrayList<Pair<String, String>> getEdges() {
+    public ArrayList<Pair<String, String>> getEnabledEdges() {
         return edges;
     }
 
