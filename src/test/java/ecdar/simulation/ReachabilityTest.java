@@ -180,13 +180,15 @@ public class ReachabilityTest {
         Ecdar.setSimulationHandler(simulationHandler);
 
         var query = BackendHelper.getLocationReachableQuery(location, component, "query");
-        int underscoreCount = 0;
+        int commaCount = 0;
         for (int i = 0; i < query.length(); i++) {
-            if (query.charAt(i) == '_') {
-                underscoreCount++;
+            if (query.charAt(i) == ',') {
+                commaCount++;
             }
         }
 
-        assertEquals(Ecdar.getSimulationHandler().getComponentsInSimulation().size(), underscoreCount + 1);
+        int expected = commaCount + 1;
+
+        assertEquals(expected, Ecdar.getSimulationHandler().getComponentsInSimulation().size());
     }
 }
