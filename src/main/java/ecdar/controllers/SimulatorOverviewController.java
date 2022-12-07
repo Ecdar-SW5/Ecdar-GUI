@@ -67,6 +67,8 @@ public class SimulatorOverviewController implements Initializable {
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
+        simulationHandler = Ecdar.getSimulationHandler();
+
         groupContainer = new Group();
         processContainer = new FlowPane();
         //In case that the processContainer gets moved around we have to keep in into place.
@@ -79,8 +81,6 @@ public class SimulatorOverviewController implements Initializable {
         // Add the processes and group to the view
         addProcessesToGroup();
         scrollPane.setContent(groupContainer);
-
-        simulationHandler = Ecdar.getSimulationHandler();
     }
 
     /**

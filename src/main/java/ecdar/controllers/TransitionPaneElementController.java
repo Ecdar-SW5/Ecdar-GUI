@@ -45,9 +45,9 @@ public class TransitionPaneElementController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        simulationHandler = Ecdar.getSimulationHandler();
         initializeTransitionExpand();
         initializeDelayChooser();
-        simulationHandler = Ecdar.getSimulationHandler();
     }
 
     /**
