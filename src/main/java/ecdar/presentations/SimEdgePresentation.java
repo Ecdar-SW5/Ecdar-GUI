@@ -29,14 +29,14 @@ public class SimEdgePresentation extends Group {
 
         // when hovering mouse the curser should change to hand
         this.setOnMouseEntered(event -> {
-            if (Ecdar.getSimulationHandler().currentState.get().getEdges().contains(new Pair<>(component.getName(), edge.getId())))
+            if (Ecdar.getSimulationHandler().currentState.get().getEnabledEdges().contains(new Pair<>(component.getName(), edge.getId())))
                 this.getScene().setCursor(javafx.scene.Cursor.HAND);
         });
         this.setOnMouseExited(event -> this.getScene().setCursor(javafx.scene.Cursor.DEFAULT));
 
         // when clicking the edge the edge should be selected and the simulation should take next step (if the edge is enabled)
         this.setOnMouseClicked(event -> {
-            if (Ecdar.getSimulationHandler().currentState.get().getEdges().contains(new Pair<>(component.getName(), edge.getId()))) {
+            if (Ecdar.getSimulationHandler().currentState.get().getEnabledEdges().contains(new Pair<>(component.getName(), edge.getId()))) {
                 Ecdar.getSimulationHandler().selectedEdge.set(edge);
                 Ecdar.getSimulationHandler().nextStep();
             }

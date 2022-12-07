@@ -372,14 +372,14 @@ public class SimulatorOverviewController implements Initializable {
 
     public void highlightAvailableEdges(SimulationState state) {
         // unhighlight all edges
-        for (Pair<String,String> edge : state.getEdges()) {
+        for (Pair<String,String> edge : state.getEnabledEdges()) {
             processPresentations.values().stream()
                     .forEach(p -> p.getController().getComponent().getEdges().stream()
                             .forEach(e -> e.setIsHighlighted(false)));
         }
 
         // highlight available edges in the given state
-        for (Pair<String,String> edge : state.getEdges()) {
+        for (Pair<String,String> edge : state.getEnabledEdges()) {
             processPresentations.values().stream()
                     .forEach(p -> p.getController().getComponent().getEdges().stream()
                         .forEach(e -> {
