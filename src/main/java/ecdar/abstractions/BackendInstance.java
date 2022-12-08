@@ -114,11 +114,10 @@ public class BackendInstance implements Serializable {
 
     @Override
     public void deserialize(final JsonObject json) {
-        setIsThreadSafe(true);
         setName(json.getAsJsonPrimitive(NAME).getAsString());
         setLocal(json.getAsJsonPrimitive(IS_LOCAL).getAsBoolean());
         setDefault(json.getAsJsonPrimitive(IS_DEFAULT).getAsBoolean());
-        // setIsThreadSafe(json.getAsJsonPrimitive(IS_THREAD_SAFE).getAsBoolean());
+        setIsThreadSafe(json.getAsJsonPrimitive(IS_THREAD_SAFE).getAsBoolean());
         setBackendLocation(json.getAsJsonPrimitive(LOCATION).getAsString());
         setPortStart(json.getAsJsonPrimitive(PORT_RANGE_START).getAsInt());
         setPortEnd(json.getAsJsonPrimitive(PORT_RANGE_END).getAsInt());
