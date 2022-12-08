@@ -625,7 +625,6 @@ public class EcdarController implements Initializable {
                     break;
                 }
             }
-            // scaling.selectToggle(scaleM); // Necessary to avoid project pane appearing off-screen
             scaling.selectToggle((RadioMenuItem) matchingToggle);
         });
 
