@@ -1,6 +1,5 @@
 package ecdar.ui;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testfx.util.WaitForAsyncUtils;
 
@@ -9,31 +8,23 @@ import com.jfoenix.controls.JFXComboBox;
 import ecdar.Ecdar;
 import ecdar.abstractions.Query;
 import ecdar.abstractions.QueryState;
-import ecdar.backend.SimulationHandler;
-import ecdar.presentations.SimulationInitializationDialogPresentation;
+import ecdar.controllers.EcdarController;
+import ecdar.controllers.EcdarController.Mode;
 import javafx.application.Platform;
-import javafx.scene.layout.BorderPane;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.testfx.api.FxAssert.verifyThat;
-
-import java.util.Optional;
 
 public class UiSwitcherTest extends TestFXBase {
     @Test
     public void UiSwitcherNoComponentsTest() {
+        Ecdar.setUpForTest();
         WaitForAsyncUtils.waitForFxEvents();
         clickOn("#switchGuiView");
         WaitForAsyncUtils.waitForFxEvents();
-        JFXComboBox<String> simDialogComboBox = lookup("#simulationComboBox").query();
+        JFXComboBox<String> simDialog = lookup("#simulationComboBox").query();
         WaitForAsyncUtils.waitForFxEvents();
-        assertFalse(simDialogComboBox.isShowing());
-    }
-    
-    @Test
-    public void UiSwitcherTest() {
+        assertFalse(simDialog.isShowing());
+
         WaitForAsyncUtils.waitForFxEvents();
         Platform.runLater(() -> Ecdar.getProject().getQueries().add(new Query("(Component1)", "null", QueryState.UNKNOWN)));
         WaitForAsyncUtils.waitForFxEvents();
@@ -44,6 +35,6 @@ public class UiSwitcherTest extends TestFXBase {
         WaitForAsyncUtils.waitForFxEvents();
         clickOn("#startButton");
         WaitForAsyncUtils.waitForFxEvents();
-        assertEquals(Ecdar.getPresentation().getController().currentMode.get().name(), "Simulator");
+        assertEquals(EcdarController.currentMode.get(), Mode.Simulator);
     }
 }
